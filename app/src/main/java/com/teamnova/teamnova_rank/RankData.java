@@ -30,6 +30,20 @@ public class RankData {
 
     }
 
+    /**
+     * RankData 생성자이다.
+     * DB등록시 입력되는 rankID 제외, 모든 목록이 만들어진 후 랭킹이 입력되기때문에 ranking 제외
+     *
+     * @param rankTitle 게시글 제목
+     * @param rankWriter 게시글 작성자
+     * @param createDate 게시글 작성일
+     * @param detailLink 상세 보기 링크
+     * @param thumbPath 썸네일 url
+     * @param viewCount 조회수
+     * @param likeCount 좋아요 개수
+     * @param replyCount 댓글 개수
+     * @param rankType 작품 단계(기초, ..., 응용1, 응용2)
+     */
     public RankData(String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath, int viewCount, int likeCount, int replyCount, int rankType) {
         this.rankTitle = rankTitle;
         this.rankWriter = rankWriter;

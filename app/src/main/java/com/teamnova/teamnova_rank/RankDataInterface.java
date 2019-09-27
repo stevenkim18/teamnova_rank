@@ -5,6 +5,19 @@ import java.util.List;
 /**
  * 인터페이스 명 : RankDataInterface
  * 설명 : SQLiteDB의 랭크 데이터 처리
+ *
+ * Class RankData 구조
+ *     private int rankID; //식별 문자
+ *     private String rankTitle; //게시글 제목
+ *     private String rankWriter; //게시글 작성자
+ *     private String createDate; //게시글 작성일
+ *     private String detailLink; //상세 보기 링크
+ *     private String thumbPath; //썸네일 url
+ *     private int viewCount; //조회수
+ *     private int likeCount; //좋아요 개수
+ *     private int replyCount; //댓글 개수
+ *     private int rankType; //작품 단계(기초, ..., 응용1, 응용2)
+ *     private int ranking; //랭킹
  */
 public interface RankDataInterface {
 

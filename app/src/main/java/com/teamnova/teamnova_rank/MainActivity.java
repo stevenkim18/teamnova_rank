@@ -14,6 +14,8 @@ public class MainActivity extends AppCompatActivity {
     Button button;
     CheckBox checkbox; //테스트변수
 
+    // 슬랙 깃허브 연동 테스트
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

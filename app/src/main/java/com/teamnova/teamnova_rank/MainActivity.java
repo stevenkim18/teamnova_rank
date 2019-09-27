@@ -4,13 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView textView;
     Button button;
-
+    CheckBox checkbox; //테스트변수
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

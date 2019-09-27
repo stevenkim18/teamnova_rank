@@ -118,17 +118,11 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/top_rank_recyclerview"
+        android:id="@+id/rank_recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/main_depth_ll"
-        android:layout_marginTop="-5dp"
+        android:layout_marginTop="5dp"
         android:scrollbars="vertical"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/down_rank_recyclerview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/top_rank_recyclerview"
-        android:scrollbars="vertical"/>
 </RelativeLayout>

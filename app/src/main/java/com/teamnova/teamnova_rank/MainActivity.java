@@ -16,12 +16,12 @@ public class MainActivity extends AppCompatActivity {
     //mainAndroidBtn:메인에서 안드로이드 작품들 보여주는 버튼
     //mainPhpBtn:메인에서 php 작품들 보여주는 버튼
     //mainDepth1Btn:메인에서 응용1단계 작품들 보여주는 버튼
-    //mainDepth2Btn:메인에서 응용2단계 작품들 보여주는 버튼 
+    //mainDepth2Btn:메인에서 응용2단계 작품들 보여주는 버튼
     private Button mainJavaBtn, mainAndroidBtn, mainPhpBtn, mainDepth1Btn, mainDepth2Btn;
 
-    //topRankRecyclerview:1,2,3등 상위 랭킹 작품들을 보여주는 리사이클러뷰
-    //downRankRecyclerview:1,2,3등 제외한 하위 랭킹 작품들을 보여주는 리사이클러뷰
-    private RecyclerView topRankRecyclerview, downRankRecyclerview;
+    //RankRecyclerview:랭킹 작품들을 보여주는 리사이클러뷰
+
+    private RecyclerView RankRecyclerview;
 
 
     @Override

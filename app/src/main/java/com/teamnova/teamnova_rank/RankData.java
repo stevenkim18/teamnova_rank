@@ -2,7 +2,8 @@ package com.teamnova.teamnova_rank;
 
 /**
  * 클래스명 : RankData class
- * 설명 : 크롤링한 데이터가 담긴다.
+ * 설명 : 팀노바 오픈 카페(https://cafe.naver.com/teamnovaopen) - 팀노바 작품 동영상의 게시물 목록을 크롤링한 데이터가 담긴다.
+ *
  * 참조 : https://trello.com/b/i59vsfKE/scstnghks - 규칙 - 데이터 모델 구조 카드
  */
 public class RankData {

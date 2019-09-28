@@ -26,7 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     private static DatabaseHelper instance = null;
     public static DatabaseHelper getInstance(Context context){
-        if(instance != null){
+        if(instance == null){
             instance = new DatabaseHelper(context.getApplicationContext());
         }
         return instance;

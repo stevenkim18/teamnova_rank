@@ -38,7 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private static final String RANK_LIKE_COUNT = "LIKE_COUNT"; //좋아요 개수
     private static final String RANK_REPLY_COUNT = "REPLY_COUNT"; //댓글 개수
     private static final String RANK_RANKING = "RANKING"; //랭킹
-    private static final String RANK_TYPE = "TYPE"; //작품 단계(기초, ..., 응용1, 응용2)
+    private static final String RANK_TYPE = "TYPE";  //작품 단계(기초, ..., 응용1, 응용2)
 
 
     /* 테이블 생성 쿼리 */

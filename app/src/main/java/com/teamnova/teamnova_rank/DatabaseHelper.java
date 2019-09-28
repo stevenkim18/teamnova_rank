@@ -58,7 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private final int RANK_TYPE_HARD_2 = 4;
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -139,6 +139,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /**
+     * 해당 타입 목록 모두 삭제
+     * @param rankType
+     */
+    public void deleteRankData(int rankType){
+        database.delete(TABLE_NAME_RANK, RANK_TYPE + "="+rankType,null);
+    }
+
+    /**
      * 네이버 팀노바 오픈 카페 - 작품 크롤링 데이터를 DB에 저장한다.
      * @param rankTitle 게시글 제목
      * @param rankWriter 게시글 작성자
@@ -153,19 +161,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     @Override
     public void insertRankData(String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath
             , int viewCount, int likeCount, int replyCount, int rankType) {
-//        String query = "INSERT INTO "+TABLE_NAME_RANK +"(" +
-//                RANK_TITLE + ", " +
-//                RANK_WRITER + ", " +
-//                RANK_CREATE_DATE + ", " +
-//                RANK_DETAIL_LINK + ", " +
-//                RANK_THUMB_PATH + ", " +
-//                RANK_VIEW_COUNT + ", " +
-//                RANK_LIKE_COUNT + ", " +
-//                RANK_REPLY_COUNT + ", " +
-//                RANK_RANKING + ", " +
-//                RANK_TYPE +
-//                ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-//        database.execSQL(query);
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(RANK_TITLE          ,rankTitle);
@@ -178,7 +173,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         contentValues.put(RANK_REPLY_COUNT    ,replyCount);
         contentValues.put(RANK_TYPE           ,rankType);
 
+        //데이터 목록 등록
         database.insert(TABLE_NAME_RANK, null, contentValues);
+
     }
 
     /**
@@ -235,8 +232,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         List<RankData> resultList = new ArrayList<>();
         // 우선순위는 조회수 + (좋아요 개수 * 5)가 높은 순
         String query = "SELECT "+
-//                                "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
-                                "'1' AS RANKING , " +
+//                                "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT) ASC) AS RANKING ,"+
+//                                "'1' AS RANKING , " +
+//                                "(SELECT COUNT(*) FROM "+TABLE_NAME_RANK+" TEMP WHERE RANK.RANK_ID) AS RANKING ," +
+                                "1 AS RANKING ," +
                                 "TITLE ,"+
                                 "WRITER ,"+
                                 "CREATE_DATE ,"+
@@ -248,15 +247,19 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                                 "TYPE ,"+
                                 "RANK_ID "+
                         " FROM " +
-                                TABLE_NAME_RANK +
+                                TABLE_NAME_RANK +" RANK " +
                         " WHERE " +
-                                "TYPE = "+TYPE_STEP;
+                                "TYPE = '"+TYPE_STEP +"'" +
+                        " ORDER BY " +
+                                "VIEW_COUNT + (5 * LIKE_COUNT) DESC";
 
-        Log.d(TAG, "selectHardStep2List 쿼리 : "+query);
+        Log.d(TAG, "쿼리 : "+query);
 
         Cursor cursor = database.rawQuery(query,null);
+        int ranking = 1;
         while(cursor.moveToNext()){
-            int ranking         = cursor.getInt(0);
+//            int ranking         = cursor.getInt(0);
+            int index           = ranking;
             String title        = cursor.getString(1);
             String writer       = cursor.getString(2);
             String create_date  = cursor.getString(3);
@@ -270,6 +273,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
             RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
             resultList.add(rankData);
+            ranking++;
         }
         return resultList;
     }

@@ -35,11 +35,13 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mainToolbar;
 
 
+    // 슬랙 깃허브 연동 테스트
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         mainJavaStepBtn = findViewById(R.id.main_java_step_btn);
         mainAndroidStepBtn = findViewById(R.id.main_android_step_btn);
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
 

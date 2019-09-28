@@ -58,13 +58,15 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private final int RANK_TYPE_HARD_2 = 4;
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
-    private static final String TABLE_NAME_RANK = "RANK_INFO_TB";
+    private static final String TABLE_NAME_RANK = "RANK_INFO_TB"; // 크롤링한 정보
+    private static final String TABLE_NAME_CRAWL_SCHEME = "CRAWL_SCHEME_TB"; //크롤링한 날짜 및 기타 정보
 
     /* 데이터 타입 */
+    // RANK_INFO_TB
     private static final String RANK_RANK_ID = "RANK_ID"; //식별 문자
     private static final String RANK_TITLE = "TITLE"; //게시글 제목
     private static final String RANK_WRITER = "WRITER"; //게시글 작성자
@@ -77,11 +79,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private static final String RANK_RANKING = "RANKING"; //랭킹
     private static final String RANK_TYPE = "TYPE";  //작품 단계(기초, ..., 응용1, 응용2)
 
+    // CRAWL_DATE_TB
+    private static final String CRAWL_SCHEME_CRAWL_ID = "CRAWL_ID";
+    private static final String CRAWL_SCHEME_CRAWL_DATE = "CRAWL_DATE";
+
 
     /* 테이블 생성 쿼리 */
+    // RANK_INFO_TB 생성
     private static final String CREATE_RANK_TABLE =
             "CREATE TABLE " + TABLE_NAME_RANK + "(" +
-                    RANK_RANK_ID + "INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    RANK_RANK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     RANK_TITLE + " TEXT, " +
                     RANK_WRITER + " TEXT, " +
                     RANK_CREATE_DATE + " TEXT, " +
@@ -94,6 +101,13 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                     RANK_TYPE + " INTEGER " +
                     ")";
 
+    // CRAWL_DATE_TB 생성
+    private static final String CREATE_CRAWL_SCHEME_TABLE =
+            "CREATE TABLE " + TABLE_NAME_CRAWL_SCHEME + "(" +
+                    CRAWL_SCHEME_CRAWL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    CRAWL_SCHEME_CRAWL_DATE + " TEXT " +
+                    ")";
+
     public DatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -104,18 +118,25 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         // 앱을 삭제후 앱을 재설치하면 기존 DB파일은 앱 삭제시 지워지지 않기 때문에
         // 테이블이 이미 있다고 생성 에러남
         // 앱을 재설치시 데이터베이스를 삭제해줘야함.
+
+        // RANK 정보 테이블 생성
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_RANK);
         db.execSQL(CREATE_RANK_TABLE);
+
+        // 크롤링 정보 테이블 생성
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME_CRAWL_SCHEME);
+        db.execSQL(CREATE_CRAWL_SCHEME_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME_RANK);
+        db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME_CRAWL_SCHEME);
         onCreate(db);
     }
 
+    // 오늘 날짜로 크롤링한 기록이 있는지 확인한다.
 
-    // ----------------- 하단 구현할 로직 -----------------
 
     /**
      * 네이버 팀노바 오픈 카페 - 작품 크롤링 데이터를 DB에 저장한다.
@@ -147,15 +168,15 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 //        database.execSQL(query);
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put("RANK_TITLE"          ,rankTitle);
-        contentValues.put("RANK_WRITER"         ,rankWriter);
-        contentValues.put("RANK_CREATE_DATE"    ,createDate);
-        contentValues.put("RANK_DETAIL_LINK"    ,detailLink);
-        contentValues.put("RANK_THUMB_PATH"     ,thumbPath);
-        contentValues.put("RANK_VIEW_COUNT"     ,viewCount);
-        contentValues.put("RANK_LIKE_COUNT"     ,likeCount);
-        contentValues.put("RANK_REPLY_COUNT"    ,replyCount);
-        contentValues.put("RANK_TYPE"           ,rankType);
+        contentValues.put(RANK_TITLE          ,rankTitle);
+        contentValues.put(RANK_WRITER         ,rankWriter);
+        contentValues.put(RANK_CREATE_DATE    ,createDate);
+        contentValues.put(RANK_DETAIL_LINK    ,detailLink);
+        contentValues.put(RANK_THUMB_PATH     ,thumbPath);
+        contentValues.put(RANK_VIEW_COUNT     ,viewCount);
+        contentValues.put(RANK_LIKE_COUNT     ,likeCount);
+        contentValues.put(RANK_REPLY_COUNT    ,replyCount);
+        contentValues.put(RANK_TYPE           ,rankType);
 
         database.insert(TABLE_NAME_RANK, null, contentValues);
     }
@@ -214,7 +235,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         List<RankData> resultList = new ArrayList<>();
         // 우선순위는 조회수 + (좋아요 개수 * 5)가 높은 순
         String query = "SELECT "+
-                                "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
+//                                "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
+                                "'1' AS RANKING , " +
                                 "TITLE ,"+
                                 "WRITER ,"+
                                 "CREATE_DATE ,"+
@@ -224,10 +246,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                                 "LIKE_COUNT ,"+
                                 "REPLY_COUNT ,"+
                                 "TYPE ,"+
-                                "RANK_ID"+
-                        "FROM " +
+                                "RANK_ID "+
+                        " FROM " +
                                 TABLE_NAME_RANK +
-                        "WHERE " +
+                        " WHERE " +
                                 "TYPE = "+TYPE_STEP;
 
         Log.d(TAG, "selectHardStep2List 쿼리 : "+query);

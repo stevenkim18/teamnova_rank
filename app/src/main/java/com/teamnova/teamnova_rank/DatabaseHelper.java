@@ -58,7 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private final int RANK_TYPE_HARD_2 = 4;
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -78,6 +78,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private static final String RANK_REPLY_COUNT = "REPLY_COUNT"; //댓글 개수
     private static final String RANK_RANKING = "RANKING"; //랭킹
     private static final String RANK_TYPE = "TYPE";  //작품 단계(기초, ..., 응용1, 응용2)
+    private static final String RANK_RANK_POINT = "RANK_POINT";  //작품 단계(기초, ..., 응용1, 응용2)
+
 
     // CRAWL_DATE_TB
     private static final String CRAWL_SCHEME_CRAWL_ID = "CRAWL_ID";
@@ -98,7 +100,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                     RANK_LIKE_COUNT + " INTEGER, " +
                     RANK_REPLY_COUNT + " INTEGER, " +
                     RANK_RANKING + " INTEGER, " +
-                    RANK_TYPE + " INTEGER " +
+                    RANK_TYPE + " INTEGER, " +
+                    RANK_RANK_POINT + " INTEGER " +
                     ")";
 
     // CRAWL_DATE_TB 생성
@@ -172,6 +175,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         contentValues.put(RANK_LIKE_COUNT     ,likeCount);
         contentValues.put(RANK_REPLY_COUNT    ,replyCount);
         contentValues.put(RANK_TYPE           ,rankType);
+        contentValues.put(RANK_RANK_POINT     ,viewCount + (likeCount * 5));
 
         //데이터 목록 등록
         database.insert(TABLE_NAME_RANK, null, contentValues);
@@ -245,7 +249,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                                 "LIKE_COUNT ,"+
                                 "REPLY_COUNT ,"+
                                 "TYPE ,"+
-                                "RANK_ID "+
+                                "RANK_ID ,"+
+                                "RANK_POINT "+
                         " FROM " +
                                 TABLE_NAME_RANK +" RANK " +
                         " WHERE " +
@@ -256,10 +261,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         Log.d(TAG, "쿼리 : "+query);
 
         Cursor cursor = database.rawQuery(query,null);
-        int ranking = 1;
+        int index = 1;
         while(cursor.moveToNext()){
 //            int ranking         = cursor.getInt(0);
-            int index           = ranking;
+            int ranking           = index;
             String title        = cursor.getString(1);
             String writer       = cursor.getString(2);
             String create_date  = cursor.getString(3);
@@ -270,10 +275,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
             int reply_count     = cursor.getInt(8);
             int type            = cursor.getInt(9);
             int rankId          = cursor.getInt(10);
+            int rankPoint       = cursor.getInt(11);
 
-            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
+            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking, rankPoint);
             resultList.add(rankData);
-            ranking++;
+            index++;
         }
         return resultList;
     }

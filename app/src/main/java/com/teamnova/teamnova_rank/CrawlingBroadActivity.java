@@ -156,7 +156,11 @@ public class CrawlingBroadActivity extends AppCompatActivity {
 
             Log.v(TAG, "이미지 태그 = " + image_tag.text());
 
-            if(image_tag.text().equals("동영상")){
+            // 동영상이 2개 이상 올린 게시글이 있어서 이미지태그에 "동영상" 이라는 텍스트가 포함 되면 썸네일 주소를 가지고 옴.
+            // 동영상 1개 --> "동영상"
+            // 동영상 2개 --> "동영상 1개의 추가 이미지가 있습니다"
+            // 동영상 3개 --> "동영상 2개의 추가 이미지가 있습니다"
+            if(image_tag.text().contains("동영상")){
                 // "img"태그에 접근
                 Elements img_tag = image_tag.select("a > img");
 

@@ -20,6 +20,18 @@ import java.util.List;
  */
 public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterface {
 
+    /**
+     * 싱글톤 패턴
+     * 사용 : DatabaseHelper.getInstance(getApplicationContext()).selectBasicAndroidStepList();
+     */
+    private static DatabaseHelper instance = null;
+    public static DatabaseHelper getInstance(Context context){
+        if(instance != null){
+            instance = new DatabaseHelper(context.getApplicationContext());
+        }
+        return instance;
+    }
+
     /* 데이터베이스 버전 및 이름 */
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "teamnova_rank.db";
@@ -57,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                     RANK_TYPE + " INTEGER " +
                     ")";
 
-    public DatabaseHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+    public DatabaseHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

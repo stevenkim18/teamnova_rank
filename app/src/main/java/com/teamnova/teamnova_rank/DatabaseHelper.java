@@ -41,24 +41,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         return instance;
     }
 
-
-    /*
-     * 단계별 목록을 DB에서 가져올때 RnakData class의 rankType 변수 숫자별 의미
-     *
-     * 0 : 기초 자바 작품
-     * 1 : 기초 안드로이드 작품
-     * 2 : 기초 PHP 작품
-     * 3 : 응용 1단계 작품
-     * 4 : 응용 2단계 작품
-     */
-    private final int RANK_TYPE_BASIC_JAVA = 0;
-    private final int RANK_TYPE_BASIC_ANDROID = 1;
-    private final int RANK_TYPE_BASIC_PHP = 2;
-    private final int RANK_TYPE_HARD_1 = 3;
-    private final int RANK_TYPE_HARD_2 = 4;
-
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -165,7 +149,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                         " FROM "+
                                 TABLE_NAME_CRAWL_SCHEME +
                         " WHERE " +
-                                CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now')" +
+                                CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
                                 "AND "+ CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
                                 "AND "+ CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = "+ COURSE_TYPE;
 
@@ -241,7 +225,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicJavaStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_JAVA);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_JAVA);
     }
 
     /**
@@ -250,7 +234,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicAndroidStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_ANDROID);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_ANDROID);
     }
 
     /**
@@ -259,7 +243,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicPhpStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_PHP);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_PHP);
     }
 
     /**
@@ -268,7 +252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectHardStep1List() {
-        return selectRankListByType(RANK_TYPE_HARD_1);
+        return selectRankListByType(Constant.RANK_TYPE_HARD_1);
     }
 
     /**
@@ -277,7 +261,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectHardStep2List() {
-        return selectRankListByType(RANK_TYPE_HARD_2);
+        return selectRankListByType(Constant.RANK_TYPE_HARD_2);
     }
 
     /**

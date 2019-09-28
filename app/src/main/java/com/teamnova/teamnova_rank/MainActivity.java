@@ -15,11 +15,12 @@ public class MainActivity extends AppCompatActivity {
     CheckBox checkbox; //테스트변수
 
     // 슬랙 깃허브 연동 테스트
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
     }
 }

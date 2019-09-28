@@ -20,6 +20,14 @@ public class RankData {
     private int viewCount;
     private int likeCount;
     private int replyCount;
+
+    /**
+     * 0 : 기초 자바 작품
+     * 1 : 기초 안드로이드 작품
+     * 2 : 기초 PHP 작품
+     * 3 : 응용 1단계 작품
+     * 4 : 응용 2단계 작품
+     */
     private int rankType;
 
     /**
@@ -55,6 +63,20 @@ public class RankData {
         this.likeCount = likeCount;
         this.replyCount = replyCount;
         this.rankType = rankType;
+    }
+
+    public RankData(int rankID, String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath, int viewCount, int likeCount, int replyCount, int rankType, int ranking) {
+        this.rankID = rankID;
+        this.rankTitle = rankTitle;
+        this.rankWriter = rankWriter;
+        this.createDate = createDate;
+        this.detailLink = detailLink;
+        this.thumbPath = thumbPath;
+        this.viewCount = viewCount;
+        this.likeCount = likeCount;
+        this.replyCount = replyCount;
+        this.rankType = rankType;
+        this.ranking = ranking;
     }
 
     public int getRankID() {

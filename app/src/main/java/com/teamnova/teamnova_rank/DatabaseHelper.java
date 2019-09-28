@@ -3,11 +3,14 @@ package com.teamnova.teamnova_rank;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +24,7 @@ import java.util.List;
  */
 public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterface {
 
+    private static final String TAG = "DatabaseHelper";
 
     private static DatabaseHelper instance = null;
     private static SQLiteDatabase database;
@@ -143,29 +147,255 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         database.insert(TABLE_NAME_RANK, null, contentValues);
     }
 
+
+    /*
+     * 단계별 목록을 DB에서 가져올때 RnakData class의 rankType 변수 숫자별 의미
+     *
+     * 0 : 기초 자바 작품
+     * 1 : 기초 안드로이드 작품
+     * 2 : 기초 PHP 작품
+     * 3 : 응용 1단계 작품
+     * 4 : 응용 2단계 작품
+     */
+
+    /**
+     * 기초 자바 단계 목록을 반환한다.
+     * @return
+     */
     @Override
     public List<RankData> selectBasicJavaStepList() {
-        return null;
+        List<RankData> resultList = new ArrayList<>();
+
+        // 기초 자바단계 작품 검색 쿼리, 우선순위는 조회수 + (좋아요 개수 * 5)가 높은 순
+        String query = "SELECT "+
+                            "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
+                            "TITLE ,"+
+                            "WRITER ,"+
+                            "CREATE_DATE ,"+
+                            "DETAIL_LINK ,"+
+                            "THUMB_PATH ,"+
+                            "VIEW_COUNT ,"+
+                            "LIKE_COUNT ,"+
+                            "REPLY_COUNT ,"+
+                            "TYPE ,"+
+                            "RANK_ID"+
+                        "FROM " +
+                            TABLE_NAME_RANK +
+                        "WHERE " +
+                            "TYPE = 0";
+
+        Log.d(TAG, "selectBasicJavaStepList 쿼리 : "+query);
+
+        Cursor cursor = database.rawQuery(query,null);
+        while(cursor.moveToNext()){
+            int ranking         = cursor.getInt(0);
+            String title        = cursor.getString(1);
+            String writer       = cursor.getString(2);
+            String create_date  = cursor.getString(3);
+            String detail_link  = cursor.getString(4);
+            String thumb_path   = cursor.getString(5);
+            int view_count      = cursor.getInt(6);
+            int like_count      = cursor.getInt(7);
+            int reply_count     = cursor.getInt(8);
+            int type            = cursor.getInt(9);
+            int rankId          = cursor.getInt(10);
+
+            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
+            resultList.add(rankData);
+        }
+
+        return resultList;
     }
 
+    /**
+     * 기초 안드로이드 목록을 반환한다.
+     * @return
+     */
     @Override
     public List<RankData> selectBasicAndroidStepList() {
-        return null;
+        List<RankData> resultList = new ArrayList<>();
+
+        // 기초 안드로이드 단계 작품 검색 쿼리, 우선순위는 조회수 + (좋아요 개수 * 5)가 높은 순
+        String query = "SELECT "+
+                            "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
+                            "TITLE ,"+
+                            "WRITER ,"+
+                            "CREATE_DATE ,"+
+                            "DETAIL_LINK ,"+
+                            "THUMB_PATH ,"+
+                            "VIEW_COUNT ,"+
+                            "LIKE_COUNT ,"+
+                            "REPLY_COUNT ,"+
+                            "TYPE ,"+
+                            "RANK_ID"+
+                            "FROM " +
+                            TABLE_NAME_RANK +
+                    "WHERE " +
+                            "TYPE = 1";
+
+        Log.d(TAG, "selectBasicAndroidStepList 쿼리 : "+query);
+
+        Cursor cursor = database.rawQuery(query,null);
+        while(cursor.moveToNext()){
+            int ranking         = cursor.getInt(0);
+            String title        = cursor.getString(1);
+            String writer       = cursor.getString(2);
+            String create_date  = cursor.getString(3);
+            String detail_link  = cursor.getString(4);
+            String thumb_path   = cursor.getString(5);
+            int view_count      = cursor.getInt(6);
+            int like_count      = cursor.getInt(7);
+            int reply_count     = cursor.getInt(8);
+            int type            = cursor.getInt(9);
+            int rankId          = cursor.getInt(10);
+
+            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
+            resultList.add(rankData);
+        }
+        return resultList;
     }
 
+    /**
+     * 기초 php 목록을 반환한다.
+     * @return
+     */
     @Override
     public List<RankData> selectBasicPhpStepList() {
-        return null;
+        List<RankData> resultList = new ArrayList<>();
+
+        // 기초 php단계 작품 검색 쿼리, 우선순위는 조회수 + (좋아요 개수 * 5)가 높은 순
+        String query = "SELECT "+
+                            "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
+                            "TITLE ,"+
+                            "WRITER ,"+
+                            "CREATE_DATE ,"+
+                            "DETAIL_LINK ,"+
+                            "THUMB_PATH ,"+
+                            "VIEW_COUNT ,"+
+                            "LIKE_COUNT ,"+
+                            "REPLY_COUNT ,"+
+                            "TYPE ,"+
+                            "RANK_ID"+
+                     "FROM " +
+                            TABLE_NAME_RANK +
+                    "WHERE " +
+                            "TYPE = 2";
+
+        Log.d(TAG, "selectBasicPhpStepList 쿼리 : "+query);
+
+        Cursor cursor = database.rawQuery(query,null);
+        while(cursor.moveToNext()){
+            int ranking         = cursor.getInt(0);
+            String title        = cursor.getString(1);
+            String writer       = cursor.getString(2);
+            String create_date  = cursor.getString(3);
+            String detail_link  = cursor.getString(4);
+            String thumb_path   = cursor.getString(5);
+            int view_count      = cursor.getInt(6);
+            int like_count      = cursor.getInt(7);
+            int reply_count     = cursor.getInt(8);
+            int type            = cursor.getInt(9);
+            int rankId          = cursor.getInt(10);
+
+            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
+            resultList.add(rankData);
+        }
+
+        return resultList;
     }
 
+    /**
+     * 응용 1단계 목록을 반환한다.
+     * @return
+     */
     @Override
     public List<RankData> selectHardStep1List() {
-        return null;
+        List<RankData> resultList = new ArrayList<>();
+        // 응용 1단계 작품 검색 쿼리, 우선순위는 조회수 + (좋아요 개수 * 5)가 높은 순
+        String query = "SELECT "+
+                                "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
+                                "TITLE ,"+
+                                "WRITER ,"+
+                                "CREATE_DATE ,"+
+                                "DETAIL_LINK ,"+
+                                "THUMB_PATH ,"+
+                                "VIEW_COUNT ,"+
+                                "LIKE_COUNT ,"+
+                                "REPLY_COUNT ,"+
+                                "TYPE ,"+
+                                "RANK_ID"+
+                        "FROM " +
+                                 TABLE_NAME_RANK +
+                        "WHERE " +
+                                "TYPE = 3";
+
+        Log.d(TAG, "selectHardStep1List 쿼리 : "+query);
+
+        Cursor cursor = database.rawQuery(query,null);
+        while(cursor.moveToNext()){
+            int ranking         = cursor.getInt(0);
+            String title        = cursor.getString(1);
+            String writer       = cursor.getString(2);
+            String create_date  = cursor.getString(3);
+            String detail_link  = cursor.getString(4);
+            String thumb_path   = cursor.getString(5);
+            int view_count      = cursor.getInt(6);
+            int like_count      = cursor.getInt(7);
+            int reply_count     = cursor.getInt(8);
+            int type            = cursor.getInt(9);
+            int rankId          = cursor.getInt(10);
+
+            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
+            resultList.add(rankData);
+        }
+        return resultList;
     }
 
+    /**
+     * 응용 2단계 목록을 반환한다.
+     * @return
+     */
     @Override
     public List<RankData> selectHardStep2List() {
-        return null;
+        List<RankData> resultList = new ArrayList<>();
+        // 응용 2단계 작품 검색 쿼리, 우선순위는 조회수 + (좋아요 개수 * 5)가 높은 순
+        String query = "SELECT "+
+                                "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT)) AS RANKING ,"+
+                                "TITLE ,"+
+                                "WRITER ,"+
+                                "CREATE_DATE ,"+
+                                "DETAIL_LINK ,"+
+                                "THUMB_PATH ,"+
+                                "VIEW_COUNT ,"+
+                                "LIKE_COUNT ,"+
+                                "REPLY_COUNT ,"+
+                                "TYPE ,"+
+                                "RANK_ID"+
+                    "FROM " +
+                                TABLE_NAME_RANK +
+                    "WHERE " +
+                                "TYPE = 4";
+
+        Log.d(TAG, "selectHardStep2List 쿼리 : "+query);
+
+        Cursor cursor = database.rawQuery(query,null);
+        while(cursor.moveToNext()){
+            int ranking         = cursor.getInt(0);
+            String title        = cursor.getString(1);
+            String writer       = cursor.getString(2);
+            String create_date  = cursor.getString(3);
+            String detail_link  = cursor.getString(4);
+            String thumb_path   = cursor.getString(5);
+            int view_count      = cursor.getInt(6);
+            int like_count      = cursor.getInt(7);
+            int reply_count     = cursor.getInt(8);
+            int type            = cursor.getInt(9);
+            int rankId          = cursor.getInt(10);
+
+            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
+            resultList.add(rankData);
+        }
+        return resultList;
     }
 
 }

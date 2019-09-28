@@ -1,6 +1,7 @@
 package com.teamnova.teamnova_rank;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -20,17 +21,24 @@ import java.util.List;
  */
 public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterface {
 
+
+    private static DatabaseHelper instance = null;
+    private static SQLiteDatabase database;
+
     /**
      * 싱글톤 패턴
      * 사용 : DatabaseHelper.getInstance(getApplicationContext()).selectBasicAndroidStepList();
      */
-    private static DatabaseHelper instance = null;
     public static DatabaseHelper getInstance(Context context){
         if(instance == null){
             instance = new DatabaseHelper(context.getApplicationContext());
+            database = instance.getWritableDatabase(); //읽고 쓰기가 가능하다.
         }
         return instance;
     }
+
+
+
 
     /* 데이터베이스 버전 및 이름 */
     private static final int DATABASE_VERSION = 1;
@@ -92,9 +100,47 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
     // ----------------- 하단 구현할 로직 -----------------
 
+    /**
+     * 네이버 팀노바 오픈 카페 - 작품 크롤링 데이터를 DB에 저장한다.
+     * @param rankTitle 게시글 제목
+     * @param rankWriter 게시글 작성자
+     * @param createDate 게시글 작성일
+     * @param detailLink 상세 보기 링크
+     * @param thumbPath 썸네일 url
+     * @param viewCount 조회수
+     * @param likeCount 좋아요 개수
+     * @param replyCount 댓글 개수
+     * @param rankType 작품 단계(기초, ..., 응용1, 응용2)
+     */
     @Override
-    public void insertRankData(RankData rankData) {
+    public void insertRankData(String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath
+            , int viewCount, int likeCount, int replyCount, int rankType) {
+//        String query = "INSERT INTO "+TABLE_NAME_RANK +"(" +
+//                RANK_TITLE + ", " +
+//                RANK_WRITER + ", " +
+//                RANK_CREATE_DATE + ", " +
+//                RANK_DETAIL_LINK + ", " +
+//                RANK_THUMB_PATH + ", " +
+//                RANK_VIEW_COUNT + ", " +
+//                RANK_LIKE_COUNT + ", " +
+//                RANK_REPLY_COUNT + ", " +
+//                RANK_RANKING + ", " +
+//                RANK_TYPE +
+//                ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+//        database.execSQL(query);
 
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("RANK_TITLE"          ,rankTitle);
+        contentValues.put("RANK_WRITER"         ,rankWriter);
+        contentValues.put("RANK_CREATE_DATE"    ,createDate);
+        contentValues.put("RANK_DETAIL_LINK"    ,detailLink);
+        contentValues.put("RANK_THUMB_PATH"     ,thumbPath);
+        contentValues.put("RANK_VIEW_COUNT"     ,viewCount);
+        contentValues.put("RANK_LIKE_COUNT"     ,likeCount);
+        contentValues.put("RANK_REPLY_COUNT"    ,replyCount);
+        contentValues.put("RANK_TYPE"           ,rankType);
+
+        database.insert(TABLE_NAME_RANK, null, contentValues);
     }
 
     @Override

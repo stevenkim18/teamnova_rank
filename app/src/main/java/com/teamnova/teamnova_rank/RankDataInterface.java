@@ -22,7 +22,8 @@ import java.util.List;
 public interface RankDataInterface {
 
     // 크롤링한 데이터를 저장한다.
-    void insertRankData(RankData rankData);
+    void insertRankData(String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath
+            , int viewCount, int likeCount, int replyCount, int rankType);
 
     // 기초 자바단계의 작품 목록만 가져온다.
     List<RankData> selectBasicJavaStepList();

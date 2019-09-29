@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +28,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 클래스 명 : AdmobActivity class
@@ -73,6 +75,23 @@ public class AdmobActivity extends AppCompatActivity {
     // 크롤링 할 URL 주소를 담는 리스트
     private ArrayList<String> urls;
 
+    // 크롤링 asyncTask;
+    private AdmobActivity.JsoupAsyncTask jsoupAsyncTask;
+
+    // 광고 시청 정상 종료 판단
+    boolean isRewardSuccess = false;
+    boolean isCrawlSuccess = false;
+    /*
+        최신 데이터로 업데이트가 필요한 목록
+        ex)
+            기초 자바         X
+            기초 안드로이드     O
+            기초 PHP         O
+            응용 1단계        X
+            응용 2단계        O
+       일 경우 목록에는 기초 자바, 응용 1단계만 들어간다.
+     */
+    public CopyOnWriteArrayList<Integer> updateList = new CopyOnWriteArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,6 +106,10 @@ public class AdmobActivity extends AppCompatActivity {
 
         /* view 초기화 */
         initView();
+
+        /* 크롤링 해야될 목록 */
+        initUpdateList();
+
         crawlDateTv.setText("기준 일자 : "+DateUtil.getToday());
 
         /* 광고 영상 초기화 */
@@ -103,17 +126,38 @@ public class AdmobActivity extends AppCompatActivity {
                         public void onRewardedAdOpened() {
                             // Ad opened.
                             Log.d("광고 오픈","onRewardedAdOpened");
-                            AdmobActivity.JsoupAsyncTask jsoupAsyncTask = new AdmobActivity.JsoupAsyncTask();
-                            jsoupAsyncTask.execute();
                         }
 
                         public void onRewardedAdClosed() {
                             // Ad closed.
+                            Log.d("광고 끝남","true");
+                            if(isRewardSuccess){
+                                // 크롤링 중이라면 랭킹 화면 이동 버튼을 안보이게 처리한다.
+                                if (jsoupAsyncTask.getStatus() == AsyncTask.Status.RUNNING){
+                                    noUpdateTv.setVisibility(View.GONE);
+                                }else{
+                                    if(isCrawlSuccess) initCrawlView();
+                                }
+                            }else{
+                                // 랭킹 이동 화면 안보이게
+                                noUpdateTv.setVisibility(View.GONE);
+
+                                // 크롤링 중이라면 취소한다.
+                                if (jsoupAsyncTask.getStatus() == AsyncTask.Status.RUNNING){
+                                    jsoupAsyncTask.cancel(true);
+                                }
+
+                                // 광고 다시 재생을 위해서는 광고 영상을 다시 받아와야함
+                                rewardedAd = createAndLoadRewardedAd();
+
+                            }
+
                         }
 
                         public void onUserEarnedReward(@NonNull RewardItem reward) {
                             // User earned reward.
                             Log.d(TAG+" 광고 시청:","완료");
+                            isRewardSuccess = true;
                         }
 
                         public void onRewardedAdFailedToShow(int errorCode) {
@@ -124,9 +168,49 @@ public class AdmobActivity extends AppCompatActivity {
                     rewardedAd.show(thisActivity, adCallback);
                 } else {
                     Log.d(TAG, "The rewarded ad wasn't loaded yet.");
+                    Toast.makeText(AdmobActivity.this, "광고 로딩중입니다.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    public void startCrawling(){
+        if(updateList.size() > 0){
+            jsoupAsyncTask = new AdmobActivity.JsoupAsyncTask();
+            jsoupAsyncTask.execute();
+        }
+    }
+
+    /**
+     * 크롤링 성공기록을 수정한다.
+     */
+    public void updateCrawlScheme(boolean isSuccess){
+        // 중간에 광고를 나온 경우 데이터 업데이트를 취소한다.
+        databaseHelper.updateCrawlScheme(updateList,isSuccess);
+
+    }
+
+    /**
+     * RewardedAd 객체는 일회용 객체로 다시 광고를 재생할 수 없다. 광고가 끝난 메소드 호출 시
+     * 다른 광고를 로드한 후 넣어준다.
+     * @return
+     */
+    public RewardedAd createAndLoadRewardedAd() {
+        RewardedAd rewardedAd = new RewardedAd(this,
+                "ca-app-pub-3940256099942544/5224354917");
+        RewardedAdLoadCallback adLoadCallback = new RewardedAdLoadCallback() {
+            @Override
+            public void onRewardedAdLoaded() {
+                // Ad successfully loaded.
+            }
+
+            @Override
+            public void onRewardedAdFailedToLoad(int errorCode) {
+                // Ad failed to load.
+            }
+        };
+        rewardedAd.loadAd(new AdRequest.Builder().build(), adLoadCallback);
+        return rewardedAd;
     }
 
     /**
@@ -141,9 +225,8 @@ public class AdmobActivity extends AppCompatActivity {
         public void onRewardedAdLoaded() {
             // Ad successfully loaded.
             stopLoadingLottie();
-
-            /* 크롤링 정보 */
-            initCrawlView();
+            initCrawlView(); // 크롤링 전 데이터를 기준으로 뷰를 보여준다.
+            startCrawling(); // 크롤링 시작
         }
 
         /**
@@ -169,6 +252,32 @@ public class AdmobActivity extends AppCompatActivity {
     }
 
     /**
+     * 크롤링해야될 목록을 검색해서 목록에 저장한다.
+     */
+    public void initUpdateList(){
+        /* 자바 기초 크롤링 기록 */
+        if(!databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA)){
+            updateList.add(Constant.RANK_TYPE_BASIC_JAVA);
+        }
+        /* 안드로이드 기초 크롤링 기록 */
+        if(!databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_BASIC_ANDROID)){
+            updateList.add(Constant.RANK_TYPE_BASIC_ANDROID);
+        }
+        /* php 기초 크롤링 기록 */
+        if(!databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_BASIC_PHP)){
+            updateList.add(Constant.RANK_TYPE_BASIC_PHP);
+        }
+        /* 응용 1단계 크롤링 기록 */
+        if(!databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_HARD_1)){
+            updateList.add(Constant.RANK_TYPE_HARD_1);
+        }
+        /* 응용 2단계 크롤링 기록 */
+        if(!databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_HARD_2)){
+            updateList.add(Constant.RANK_TYPE_HARD_2);
+        }
+    }
+
+    /**
      * sqlDB에서 오늘 날짜를 기준으로 크롤링을 성공한 기록이 있는지 확인하여 view를 보여준다.
      */
     public void initCrawlView(){
@@ -176,9 +285,7 @@ public class AdmobActivity extends AppCompatActivity {
         // true : 이미 크롤링함, false : 크롤링한 기록이 없음
         // 기록중에 하나라도 크롤링한 기록이 없다면 광고 시청 후 데이터를 업데이트 할 수 있음
 
-        // 검색 시작전 true -> 마지막 결과가 false인지 체크후 동영상 시청 여부 결정
-        boolean result = true;
-
+        boolean isUpdateComplete = true;
         /* 자바 기초 크롤링 기록 */
         if(databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA)){
             basicJavaCheckIv.setVisibility(View.VISIBLE);
@@ -186,7 +293,8 @@ public class AdmobActivity extends AppCompatActivity {
         }else{
             basicJavaCheckIv.setVisibility(View.GONE);
             basicJavaUncheckIv.setVisibility(View.VISIBLE);
-            result = false;
+            isUpdateComplete = false;
+
         }
 
         /* 안드로이드 기초 크롤링 기록 */
@@ -196,7 +304,7 @@ public class AdmobActivity extends AppCompatActivity {
         }else{
             basicAndroidCheckIv.setVisibility(View.GONE);
             basicAndroidUncheckIv.setVisibility(View.VISIBLE);
-            result = false;
+            isUpdateComplete = false;
         }
 
         /* php 기초 크롤링 기록 */
@@ -206,7 +314,7 @@ public class AdmobActivity extends AppCompatActivity {
         }else{
             basicPHPCheckIv.setVisibility(View.GONE);
             basicPHPUncheckIv.setVisibility(View.VISIBLE);
-            result = false;
+            isUpdateComplete = false;
         }
 
         /* 응용 1단계 크롤링 기록 */
@@ -216,7 +324,7 @@ public class AdmobActivity extends AppCompatActivity {
         }else{
             hard1StepCheckIv.setVisibility(View.GONE);
             hard1StepUnheckIv.setVisibility(View.VISIBLE);
-            result = false;
+            isUpdateComplete = false;
         }
 
         /* 응용 2단계 크롤링 기록 */
@@ -226,12 +334,14 @@ public class AdmobActivity extends AppCompatActivity {
         }else{
             hard2StepCheckIv.setVisibility(View.GONE);
             hard2StepUnheckIv.setVisibility(View.VISIBLE);
-            result = false;
+            isUpdateComplete = false;
         }
 
-        if(result == false){
+        /* 업데이트 필요 항목이 1개라도 있는 경우 동영상 시청후 데이터를 업데이트해야 한다. */
+        if(isUpdateComplete == false){
             dataInfoTv.setText("'최신 데이터가 아닙니다.'");
             dataUpdateTv.setVisibility(View.VISIBLE);
+            noUpdateTv.setVisibility(View.GONE);
         }else{
             dataInfoTv.setText("'최신 데이터입니다.'");
             dataUpdateTv.setVisibility(View.GONE);
@@ -272,6 +382,12 @@ public class AdmobActivity extends AppCompatActivity {
     // 크롤링을 실행하는 AsyncTask
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
 
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            updateCrawlScheme(false);
+        }
+
         // AsyncTask 실행 전
         @Override
         protected void onPreExecute() {
@@ -286,7 +402,8 @@ public class AdmobActivity extends AppCompatActivity {
             try {
 
                 for(int url_num = 0; url_num < urls.size(); url_num++){
-                    if(databaseHelper.selectCrawlScheme(url_num)) continue;
+                    Log.d("url 0 ~ 4", url_num+"");
+                    if(!updateList.contains(url_num)) continue;
 
                     // 저장된 작품 단계별 삭제
                     databaseHelper.deleteRankData(url_num);
@@ -329,6 +446,14 @@ public class AdmobActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            isCrawlSuccess = true; // 크롤링 성공
+            if(isRewardSuccess){
+                // 데이터 목록 view 초기화
+                initCrawlView();
+
+                // 랭킹 화면 이동 버튼 보이게
+                noUpdateTv.setVisibility(View.VISIBLE);
+            }
         }
 
     }
@@ -339,7 +464,12 @@ public class AdmobActivity extends AppCompatActivity {
         Elements broad_list = document.select("#main-area > ul.article-movie-sub > li");
         for (int i = 0; i < broad_list.size(); i++){
 
-            Log.v(TAG, "------------------------------------------------------------ " + (i + 1) + "번째 게시글 -----------------------------------------------------------------");
+            // sleep 시간을 조절해서 아이피 차단을 피해야 한다. 계속 수정중...
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             String title = broad_list.get(i).getElementsByClass("inner").text();
             String writer = broad_list.get(i).getElementsByClass("m-tcol-c").text();
@@ -365,14 +495,6 @@ public class AdmobActivity extends AppCompatActivity {
                 // "img"태그의 "src" 값을 저장
                 img_url = img_tag.get(0).attr("src");
 
-                // 동영상 썸네일 url
-                Log.v(TAG, "썸네일 url: " + img_url);
-
-            }
-            else {
-                // "img"태그의 "src" 값을 저장
-                // 동영상 썸네일 url
-                Log.v(TAG, "썸네일 url: " + img_url);
             }
 
             databaseHelper.insertRankData(title,writer,create_date,post_url,img_url,view_count,like_count,reply_count,STEP);
@@ -391,5 +513,24 @@ public class AdmobActivity extends AppCompatActivity {
         urls.add(Constant.CAFE_TEAMNOVA_HARD1_URL);    //응용1단계
         urls.add(Constant.CAFE_TEAMNOVA_HARD2_URL);    //응용2단계
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!isRewardSuccess){
+            // 광고를 끝까지 보지 않은 경우 크롤링 결과 재기록
+            updateCrawlScheme(isCrawlSuccess);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d("stop","stop");
+        if(!isRewardSuccess){
+            // 광고를 끝까지 보지 않은 경우 액티비티가 죽기전 성공 기록을 취소한다.
+            updateCrawlScheme(false);
+        }
     }
 }

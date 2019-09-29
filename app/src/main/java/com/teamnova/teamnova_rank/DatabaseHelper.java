@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 37;
+    private static final int DATABASE_VERSION = 58;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -193,7 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      * @param COURSE_TYPE : 코스 단계
      * @param IS_SUCCESS : 성공 여부
      */
-    public void insertCrawlScheme(final int COURSE_TYPE, final boolean IS_SUCCESS){
+    public void insertCrawlScheme(int COURSE_TYPE, boolean IS_SUCCESS){
         ContentValues contentValues = new ContentValues();
         contentValues.put(CRAWL_SCHEME_CRAWL_DATE               ,DateUtil.getToday());
         contentValues.put(CRAWL_SCHEME_CRAWL_SUCCESS            ,IS_SUCCESS ? 1 : 0);

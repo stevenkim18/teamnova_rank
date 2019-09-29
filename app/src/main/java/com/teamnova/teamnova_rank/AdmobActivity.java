@@ -3,6 +3,7 @@ package com.teamnova.teamnova_rank;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -78,9 +79,11 @@ public class AdmobActivity extends AppCompatActivity {
     // 크롤링 asyncTask;
     private AdmobActivity.JsoupAsyncTask jsoupAsyncTask;
 
-    // 광고 시청 정상 종료 판단
-    boolean isRewardSuccess = false;
-    boolean isCrawlSuccess = false;
+
+    boolean isRewardSuccess = false; // 광고를 끝까지 시청했는지 여부
+    boolean isCrawlSuccess = false; // 크롤링이 끝났는지 여부
+    boolean isAdLoaded = false; // 광고 로딩이 끝났는지 여부
+    boolean isUpdateComplete = true; // 오늘 일자 기준 업데이트가 필요한 데이터가 있다면 false;
     /*
         최신 데이터로 업데이트가 필요한 목록
         ex)
@@ -92,6 +95,9 @@ public class AdmobActivity extends AppCompatActivity {
        일 경우 목록에는 기초 자바, 응용 1단계만 들어간다.
      */
     public CopyOnWriteArrayList<Integer> updateList = new CopyOnWriteArrayList<>();
+
+    // 크롤링 완료한 단계가 들어간다. onRestart시 데이터 복구
+    public List<Integer> completeCrawlList = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -109,6 +115,8 @@ public class AdmobActivity extends AppCompatActivity {
 
         /* 크롤링 해야될 목록 */
         initUpdateList();
+        initCrawlView(); // 크롤링 전 데이터를 기준으로 셋팅
+        startCrawling(); // 크롤링 시작
 
         crawlDateTv.setText("기준 일자 : "+DateUtil.getToday());
 
@@ -225,8 +233,9 @@ public class AdmobActivity extends AppCompatActivity {
         public void onRewardedAdLoaded() {
             // Ad successfully loaded.
             stopLoadingLottie();
-            initCrawlView(); // 크롤링 전 데이터를 기준으로 뷰를 보여준다.
-            startCrawling(); // 크롤링 시작
+            isAdLoaded = true;
+            adLoadedAndView(); // 크롤링 전 데이터를 기준으로 뷰를 보여준다.
+
         }
 
         /**
@@ -275,6 +284,8 @@ public class AdmobActivity extends AppCompatActivity {
         if(!databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_HARD_2)){
             updateList.add(Constant.RANK_TYPE_HARD_2);
         }
+
+        Log.d("크롤링 해야하는 목록", TextUtils.join(",",updateList));
     }
 
     /**
@@ -285,7 +296,7 @@ public class AdmobActivity extends AppCompatActivity {
         // true : 이미 크롤링함, false : 크롤링한 기록이 없음
         // 기록중에 하나라도 크롤링한 기록이 없다면 광고 시청 후 데이터를 업데이트 할 수 있음
 
-        boolean isUpdateComplete = true;
+        isUpdateComplete = true;
         /* 자바 기초 크롤링 기록 */
         if(databaseHelper.selectCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA)){
             basicJavaCheckIv.setVisibility(View.VISIBLE);
@@ -294,7 +305,6 @@ public class AdmobActivity extends AppCompatActivity {
             basicJavaCheckIv.setVisibility(View.GONE);
             basicJavaUncheckIv.setVisibility(View.VISIBLE);
             isUpdateComplete = false;
-
         }
 
         /* 안드로이드 기초 크롤링 기록 */
@@ -337,20 +347,44 @@ public class AdmobActivity extends AppCompatActivity {
             isUpdateComplete = false;
         }
 
+        if(isAdLoaded){
+            /* 업데이트 필요 항목이 1개라도 있는 경우 동영상 시청후 데이터를 업데이트해야 한다. */
+            if(isUpdateComplete == false){
+                dataInfoTv.setText("'최신 데이터가 아닙니다.'");
+                dataUpdateTv.setVisibility(View.VISIBLE);
+                noUpdateTv.setVisibility(View.GONE);
+            }else{
+                dataInfoTv.setText("'최신 데이터입니다.'");
+                dataUpdateTv.setVisibility(View.GONE);
+                noUpdateTv.setVisibility(View.VISIBLE);
+            }
+
+                crawlInfoLl.setVisibility(View.VISIBLE);
+                crawlDateTv.setVisibility(View.VISIBLE);
+                dataInfoTv.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void adLoadedAndView(){
         /* 업데이트 필요 항목이 1개라도 있는 경우 동영상 시청후 데이터를 업데이트해야 한다. */
         if(isUpdateComplete == false){
             dataInfoTv.setText("'최신 데이터가 아닙니다.'");
-            dataUpdateTv.setVisibility(View.VISIBLE);
-            noUpdateTv.setVisibility(View.GONE);
+            if(isAdLoaded){
+                dataUpdateTv.setVisibility(View.VISIBLE);
+                noUpdateTv.setVisibility(View.GONE);
+            }
         }else{
             dataInfoTv.setText("'최신 데이터입니다.'");
-            dataUpdateTv.setVisibility(View.GONE);
-            noUpdateTv.setVisibility(View.VISIBLE);
+            if(isAdLoaded){
+                dataUpdateTv.setVisibility(View.GONE);
+                noUpdateTv.setVisibility(View.VISIBLE);
+            }
         }
-
-        crawlInfoLl.setVisibility(View.VISIBLE);
-        crawlDateTv.setVisibility(View.VISIBLE);
-        dataInfoTv.setVisibility(View.VISIBLE);
+        if(isAdLoaded){
+            crawlInfoLl.setVisibility(View.VISIBLE);
+            crawlDateTv.setVisibility(View.VISIBLE);
+            dataInfoTv.setVisibility(View.VISIBLE);
+        }
     }
 
     /* 위젯 초기화 */
@@ -385,6 +419,7 @@ public class AdmobActivity extends AppCompatActivity {
         @Override
         protected void onCancelled() {
             super.onCancelled();
+            Log.d("1111111111","");
             updateCrawlScheme(false);
         }
 
@@ -405,6 +440,7 @@ public class AdmobActivity extends AppCompatActivity {
                     Log.d("url 0 ~ 4", url_num+"");
                     if(!updateList.contains(url_num)) continue;
 
+                    completeCrawlList.add(url_num);
                     // 저장된 작품 단계별 삭제
                     databaseHelper.deleteRankData(url_num);
 
@@ -433,6 +469,7 @@ public class AdmobActivity extends AppCompatActivity {
                         getDataFromWebPage(document, url_num);
 
                     }
+
                 }
 
             } catch (IOException e) {
@@ -516,12 +553,10 @@ public class AdmobActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if(!isRewardSuccess){
-            // 광고를 끝까지 보지 않은 경우 크롤링 결과 재기록
-            updateCrawlScheme(isCrawlSuccess);
-        }
+    protected void onRestart() {
+        super.onRestart();
+        databaseHelper.updateCrawlScheme(completeCrawlList, true);
+
     }
 
     @Override

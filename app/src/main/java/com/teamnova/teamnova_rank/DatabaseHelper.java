@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -41,8 +42,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         return instance;
     }
 
+
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 58;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -126,6 +128,28 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     }
 
     /**
+     * 광고 시청을 중간에 취소할 경우 크롤링을 완료 여부를 false로 바꾼다.
+     * @param updateList
+     */
+    public void updateCrawlScheme(List<Integer> updateList, boolean isSuccess){
+
+        String query = "UPDATE " +
+                                TABLE_NAME_CRAWL_SCHEME +
+                        " SET " +
+                                CRAWL_SCHEME_CRAWL_SUCCESS + " = " + (isSuccess ? 1 : 0) +
+                        " WHERE " +
+                                 CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
+                                " AND " + CRAWL_SCHEME_CRAWL_COURSE_TYPE + " IN ("+ TextUtils.join(",",updateList) +") ";
+        database.execSQL(query);
+//        String whereQuery = CRAWL_SCHEME_CRAWL_DATE + " = ? AND "+CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = ?";
+
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(CRAWL_SCHEME_CRAWL_SUCCESS,0);
+//        database.update(TABLE_NAME_CRAWL_SCHEME,contentValues,whereQuery,new String[]{"strftime('%Y-%m-%d','now', 'localtime')",COURSE_TYPE+""});
+        Log.d(TAG,"updateCrawlScheme 실행"+query);
+    }
+
+    /**
      * 해당 단계를 같은 날짜에 크롤링한 결과가 있는지 반환한다.
      *
      * ex)
@@ -135,7 +159,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      * FROM
      * 	    CRAWL_SCHEME_TB
      * WHERE
-     * 	    CRAWL_DATE = strftime('%Y-%m-%d','now')
+     * 	    CRAWL_DATE = strftime('%Y-%m-%d','now', 'localtime')
      * 	    AND CRAWL_SUCCESS = 1
      * 	    AND CRAWL_COURSE_TYPE = 5
      * --------------------------------------------------
@@ -169,7 +193,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      * @param COURSE_TYPE : 코스 단계
      * @param IS_SUCCESS : 성공 여부
      */
-    public void insertCrawlScheme(final int COURSE_TYPE, final boolean IS_SUCCESS){
+    public void insertCrawlScheme(int COURSE_TYPE, boolean IS_SUCCESS){
         ContentValues contentValues = new ContentValues();
         contentValues.put(CRAWL_SCHEME_CRAWL_DATE               ,DateUtil.getToday());
         contentValues.put(CRAWL_SCHEME_CRAWL_SUCCESS            ,IS_SUCCESS ? 1 : 0);

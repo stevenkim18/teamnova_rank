@@ -41,24 +41,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         return instance;
     }
 
-
-    /*
-     * 단계별 목록을 DB에서 가져올때 RnakData class의 rankType 변수 숫자별 의미
-     *
-     * 0 : 기초 자바 작품
-     * 1 : 기초 안드로이드 작품
-     * 2 : 기초 PHP 작품
-     * 3 : 응용 1단계 작품
-     * 4 : 응용 2단계 작품
-     */
-    private final int RANK_TYPE_BASIC_JAVA = 0;
-    private final int RANK_TYPE_BASIC_ANDROID = 1;
-    private final int RANK_TYPE_BASIC_PHP = 2;
-    private final int RANK_TYPE_HARD_1 = 3;
-    private final int RANK_TYPE_HARD_2 = 4;
-
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -82,9 +66,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     // CRAWL_DATE_TB
-    private static final String CRAWL_SCHEME_CRAWL_ID = "CRAWL_ID";
-    private static final String CRAWL_SCHEME_CRAWL_DATE = "CRAWL_DATE";
-
+    private static final String CRAWL_SCHEME_CRAWL_ID = "CRAWL_ID"; // 식별 문자
+    private static final String CRAWL_SCHEME_CRAWL_DATE = "CRAWL_DATE"; // 크롤링한 날짜
+    private static final String CRAWL_SCHEME_CRAWL_SUCCESS = "CRAWL_SUCCESS"; // 크롤링 성공 여부 0:실패, 1:성공
+    private static final String CRAWL_SCHEME_CRAWL_COURSE_TYPE = "CRAWL_COURSE_TYPE"; // 크롤링 데이터 유형
 
     /* 테이블 생성 쿼리 */
     // RANK_INFO_TB 생성
@@ -108,7 +93,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private static final String CREATE_CRAWL_SCHEME_TABLE =
             "CREATE TABLE " + TABLE_NAME_CRAWL_SCHEME + "(" +
                     CRAWL_SCHEME_CRAWL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    CRAWL_SCHEME_CRAWL_DATE + " TEXT " +
+                    CRAWL_SCHEME_CRAWL_DATE + " TEXT ," +
+                    CRAWL_SCHEME_CRAWL_SUCCESS + " INTEGER ," +
+                    CRAWL_SCHEME_CRAWL_COURSE_TYPE + " INTEGER " +
                     ")";
 
     public DatabaseHelper(@Nullable Context context) {
@@ -138,8 +125,58 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         onCreate(db);
     }
 
-    // 오늘 날짜로 크롤링한 기록이 있는지 확인한다.
+    /**
+     * 해당 단계를 같은 날짜에 크롤링한 결과가 있는지 반환한다.
+     *
+     * ex)
+     * --------------------------------------------------
+     * SELECT
+     * 	    COUNT(*)
+     * FROM
+     * 	    CRAWL_SCHEME_TB
+     * WHERE
+     * 	    CRAWL_DATE = strftime('%Y-%m-%d','now')
+     * 	    AND CRAWL_SUCCESS = 1
+     * 	    AND CRAWL_COURSE_TYPE = 5
+     * --------------------------------------------------
+     *
+     * @return true : 이미 크롤링함, false : 크롤링한 기록이 없음
+     *
+     */
+    public boolean selectCrawlScheme(final int COURSE_TYPE){
+        String query = "SELECT "+
+                                "COUNT(*) " +
+                        " FROM "+
+                                TABLE_NAME_CRAWL_SCHEME +
+                        " WHERE " +
+                                CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
+                                "AND "+ CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
+                                "AND "+ CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = "+ COURSE_TYPE;
 
+        Cursor cursor = database.rawQuery(query,null);
+        cursor.moveToFirst();
+        boolean result = cursor.getInt(0) > 0 ? true : false;
+
+        Log.d(TAG, "selectCrawlScheme 쿼리 : "+query);
+        Log.d(TAG, "결과 : "+result);
+        return result;
+    }
+
+    /**
+     * 단계별 크롤링 완료 후 크롤링 성공 여부 및 날짜등을 기록한다.
+     * > 같은 날짜에 기록이 있는경우 크롤링을 하지 않고 DB에서 정보를 찾기 위함
+     *
+     * @param COURSE_TYPE : 코스 단계
+     * @param IS_SUCCESS : 성공 여부
+     */
+    public void insertCrawlScheme(final int COURSE_TYPE, final boolean IS_SUCCESS){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CRAWL_SCHEME_CRAWL_DATE               ,DateUtil.getToday());
+        contentValues.put(CRAWL_SCHEME_CRAWL_SUCCESS            ,IS_SUCCESS ? 1 : 0);
+        contentValues.put(CRAWL_SCHEME_CRAWL_COURSE_TYPE        ,COURSE_TYPE);
+
+        database.insert(TABLE_NAME_CRAWL_SCHEME, null, contentValues);
+    }
 
     /**
      * 해당 타입 목록 모두 삭제
@@ -188,7 +225,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicJavaStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_JAVA);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_JAVA);
     }
 
     /**
@@ -197,7 +234,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicAndroidStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_ANDROID);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_ANDROID);
     }
 
     /**
@@ -206,7 +243,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicPhpStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_PHP);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_PHP);
     }
 
     /**
@@ -215,7 +252,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectHardStep1List() {
-        return selectRankListByType(RANK_TYPE_HARD_1);
+        return selectRankListByType(Constant.RANK_TYPE_HARD_1);
     }
 
     /**
@@ -224,11 +261,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectHardStep2List() {
-        return selectRankListByType(RANK_TYPE_HARD_2);
+        return selectRankListByType(Constant.RANK_TYPE_HARD_2);
     }
 
     /**
      * 단계별로 작품 목록을 가져온다.
+     *
      * @param TYPE_STEP : 작품의 단계
      * @return
      */

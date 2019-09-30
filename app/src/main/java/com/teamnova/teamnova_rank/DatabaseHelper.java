@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 58;
+    private static final int DATABASE_VERSION = 59;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -73,7 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private static final String CRAWL_SCHEME_CRAWL_SUCCESS = "CRAWL_SUCCESS"; // 크롤링 성공 여부 0:실패, 1:성공
     private static final String CRAWL_SCHEME_CRAWL_COURSE_TYPE = "CRAWL_COURSE_TYPE"; // 크롤링 데이터 유형
 
-    /* 테이블 생성 쿼리 */
+    /* 테이블 생성 쿼리  */
     // RANK_INFO_TB 생성
     private static final String CREATE_RANK_TABLE =
             "CREATE TABLE " + TABLE_NAME_RANK + "(" +

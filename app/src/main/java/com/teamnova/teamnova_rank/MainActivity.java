@@ -8,9 +8,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,35 +38,48 @@ public class MainActivity extends AppCompatActivity {
     private Button mainJavaStepBtn, mainAndroidStepBtn, mainPhpStepBtn, mainHard1StepBtn,
             mainHard2StepBtn;
 
-
+    private TextView rankView,rankName,rankLike,rankReply;
     //RankRecyclerview:선택한 작품들을 보여주는 리사이클러뷰
     private RecyclerView RankRecyclerview;
 
     //mainToolbar:메인액티비티에서 사용하는 툴바
     private Toolbar mainToolbar;
 
-    private ArrayList<RankData> mRankData;
+    private List<RankData> mRankData;
 
-    AlertDialog alertDialog;
+    private RankDescriptionActivity alertDialog ;
+//    AlertDialog alertDialog;
 
+    /* sqlDB */
+    private DatabaseHelper databaseHelper;
 
+    private long lastClickTime = 0; //lastClickTime:마지막으로 작품카테고리(자바,안드로이드,php,응용1,응용2)를 선택한 시간
+
+    private int currentNum = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
+        /* sqldbHelper */
+        databaseHelper = DatabaseHelper.getInstance(this);
+
         mainJavaStepBtn = findViewById(R.id.main_java_step_btn);
         mainAndroidStepBtn = findViewById(R.id.main_android_step_btn);
         mainPhpStepBtn = findViewById(R.id.main_php_step_btn);
         mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
+        rankName = findViewById(R.id.rank_name);
+        rankLike = findViewById(R.id.rank_like);
+        rankReply = findViewById(R.id.rank_reply);
+        rankView = findViewById(R.id.rank_view);
+
         mainToolbar = findViewById(R.id.main_toolbar);
 
-        makeTestData();
-
+        mainJavaStepBtn.setSelected(true);
         RankRecyclerview = findViewById(R.id.rank_recyclerview);
         setSupportActionBar(mainToolbar);//메인 액티비티에서 툴바를 사용하기 위해
 
@@ -72,33 +87,44 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);//종류는 총 3가지, ListView를 사용하기 위한 사용
         RankRecyclerview.setHasFixedSize(true);//각 아이템이 보여지는 것을 일정하게
         RankRecyclerview.setLayoutManager(llm);//앞서 선언한 리싸이클러뷰를 레이아웃메니저에 붙힌다
+        RankRecyclerview.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
 
 
         RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+
+        final RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter();//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
 
+//        makeTestData();
 
         //메인 자바버튼 클릭한 경우
         mainJavaStepBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                //3초이내에 다시 눌리면 이벤트를 불러올수있다
+                if (currentNum == 0) {
+                    return;
+                }
+
+                currentNum = 0;
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
 
 
                 switch (view.getId()) {
                     //자바버튼만 selected(선택)되어서 자바버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_java_step_btn:
                         mainJavaStepBtn.setSelected(true);
-//                        mainJavaStepBtn.setClickable(false);
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
                 }
-
-
 
             }
         });
@@ -107,16 +133,30 @@ public class MainActivity extends AppCompatActivity {
         mainAndroidStepBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                if (currentNum == 1) {
+                    return;
+                }
+
+                currentNum = 1;
+
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
+
                 switch (view.getId()) {
                     //안드로이드버튼만 selected(선택)되어서 안드로이드버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_android_step_btn:
                         mainJavaStepBtn.setSelected(false);
                         mainAndroidStepBtn.setSelected(true);
+//                      mainAndroidStepBtn.setClickable(false);
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
                 }
+
 
             }
         });
@@ -125,16 +165,28 @@ public class MainActivity extends AppCompatActivity {
         mainPhpStepBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+
+                if (currentNum == 2) {
+                    return;
+                }
+
+                currentNum = 2;
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //PHP버튼만 selected(선택)되어서 PHP버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_php_step_btn:
                         mainJavaStepBtn.setSelected(false);
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(true);
+//                        mainPhpStepBtn.setClickable(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
                 }
+
             }
         });
 
@@ -142,6 +194,15 @@ public class MainActivity extends AppCompatActivity {
         mainHard1StepBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (currentNum == 3) {
+                    return;
+                }
+
+                currentNum =3;
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //응용1단계버튼만 selected(선택)되어서 응용1단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard1_step_btn:
@@ -149,16 +210,29 @@ public class MainActivity extends AppCompatActivity {
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(true);
+//                        mainHard1StepBtn.setClickable(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
                 }
+
+
             }
         });
+
 
         //메인 응용2단계버튼 클릭한 경우
         mainHard2StepBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                if (currentNum == 4) {
+                    return;
+                }
+
+                currentNum = 4;
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //응용2단계버튼만 selected(선택)되어서 응용2단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard2_step_btn:
@@ -167,38 +241,52 @@ public class MainActivity extends AppCompatActivity {
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(true);
+//                        mainHard2StepBtn.setClickable(false);
                         break;
                 }
+
             }
         });
 
+
+
     }
+
+
+
+
 
     RankRecyclerviewAdapter.OnclickItemListener onClickItemListener = new RankRecyclerviewAdapter.OnclickItemListener() {
         @Override
         public void clickDetaiInfo(RankData rankData) {
-            showAlertDialog(R.layout.dialog_rank_description);
+//            Intent intent = new Intent(MainActivity.this,RankDescriptionActivity.class);
+//            intent.putExtra("rankData",rankData);
+//            startActivity(intent);
+            showAlertDialog(rankData);
         }
     };
 
-
     //리사이클러뷰 목록에 있는 작품 아이템을 선택하면 자세하게 보여주는 다이어로그
-    private void showAlertDialog(int layout){
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        View layoutView = getLayoutInflater().inflate(layout, null);
-        Button dialogButton = layoutView.findViewById(R.id.btnDialog); //다이어로그 btnDialog레이아웃보여준다
-        dialogBuilder.setView(layoutView);
-        alertDialog = dialogBuilder.create(); //다이어로그 생성
+    private void showAlertDialog(RankData rankData) {
+//        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+//        View layoutView = getLayoutInflater().inflate(R.layout.activity_rank_description, null);
+//        Button dialogButton = layoutView.findViewById(R.id.btnDialog); //다이어로그 btnDialog레이아웃보여준다
+//        dialogBuilder.setView(layoutView);
+//        alertDialog = dialogBuilder.create(); //다이어로그 생성
+        //생성될때 선언하는 위치
+        alertDialog = new RankDescriptionActivity(MainActivity.this);
+        alertDialog.setRankData(rankData);
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         alertDialog.show();
         //확인 버튼 클릭시 다이어로그 사라짐
-        dialogButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-            }
-        });
+//        dialogButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                alertDialog.dismiss();
+//            }
+//        });
     }
 
     //메인 툴바에 사용하기위한 옵션메뉴를 생성합니다
@@ -256,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
                         standardDialog();
                         break;
 
-                        //개발자 보기를 선택했을 때
+                    //개발자 보기를 선택했을 때
                     case 1:
 
                         //개발자 소개 다이어로그 생성
@@ -286,14 +374,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+/*    //테스트하기위해서 만든 메소드입니다
+    public void makeTestData() {
+
+//        mRankData = new ArrayList<>();
+
+        mRankData = databaseHelper.selectBasicAndroidStepList();
+//      mRankData.add(new RankData(rankID,rankTitle,rankWriter,createDate,detailLink,thumbPath,
+//      viewCount,likeCount,replyCount,rankType,ranking,rankPoint));
 
 
-    //테스트하기위해서 만든 메소드입니다
-    private void makeTestData(){
-
-        mRankData = new ArrayList<>();
-
-//      mRankData.add(new RankData(rankID,rankTitle,rankWriter,createDate,detailLink,thumbPath,viewCount,likeCount,replyCount,rankType,ranking,rankPoint));
+//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 0));
+//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 0));
+//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,3, 0));
+//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,4, 0));
+//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 0));
+//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 0));
 
         mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 1000));
         mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 900));
@@ -313,4 +409,6 @@ public class MainActivity extends AppCompatActivity {
         mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,16, 9999));
 
     }
+
+    }*/
 }

@@ -84,6 +84,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rank_recyclerview"
         android:layout_width="0dp"
+
+        android:layout_width="match_parent" 
         android:layout_height="0dp"
         android:layout_margin="3dp"
         android:background="@color/colorGray2"
@@ -93,6 +95,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_hard1_step_btn"
         android:tooltipText="텍스트"/>
+        app:layout_constraintTop_toBottomOf="@+id/main_hard1_step_btn" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

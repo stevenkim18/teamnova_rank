@@ -119,7 +119,19 @@ public class AdmobActivity extends AppCompatActivity {
         initCrawlView(); // 크롤링 전 데이터를 기준으로 셋팅
         startCrawling(); // 크롤링 시작
 
-        crawlDateTv.setText("기준 일자 : "+DateUtil.getToday());
+//        crawlDateTv.setText("기준 일자 : "+DateUtil.getToday());
+        String updateDate = databaseHelper.selectLastUpdateDate();
+        crawlDateTv.setText("마지막 업데이트 : "+ ("".equals(updateDate) ? "없음" : updateDate));
+
+        /* 랭킹 페이지 이동 */
+        noUpdateTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdmobActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         /* 광고 영상 초기화 */
         rewardedAd = new RewardedAd(AdmobActivity.this, AD_TEST_KEY);
@@ -547,7 +559,7 @@ public class AdmobActivity extends AppCompatActivity {
             int like_count = Integer.parseInt(broad_list.get(i).getElementsByClass("u_cnt num-recomm").text());
 
             //게시글 url
-            String post_url = "https://cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
+            String post_url = "https://m.cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
 
             Document image_tag = Jsoup.parse(broad_list.get(i).getElementsByClass("movie-img").html());
 
@@ -603,5 +615,6 @@ public class AdmobActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
     }
 }

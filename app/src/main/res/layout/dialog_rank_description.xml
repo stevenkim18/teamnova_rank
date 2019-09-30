@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_round_background"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/thumb_path_img"
+        android:layout_width="413dp"
+        android:layout_height="292dp"
+        android:layout_gravity="center"
+        android:scaleType="fitXY"
+        android:src="@mipmap/ic_launcher"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        />
+
+
+    <ImageView
+
+        android:id="@+id/writer_imcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/rank_writer_icon"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/rank_name"
+        />
+
+    <TextView
+        android:id="@+id/rank_name"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toRightOf="@+id/writer_imcon"
+        app:layout_constraintRight_toLeftOf="@+id/like_icon"
+        android:gravity="center"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:text="김무개"
+        />
+
+    <ImageView
+        android:id="@+id/like_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/like_icon"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toRightOf="@+id/rank_name"
+        app:layout_constraintRight_toLeftOf="@+id/rank_like"
+        />
+
+    <TextView
+        android:id="@+id/rank_like"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toRightOf="@+id/like_icon"
+        app:layout_constraintRight_toLeftOf="@+id/reply_icon"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="1"
+        />
+
+    <ImageView
+        android:id="@+id/reply_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="6dp"
+        android:src="@drawable/reply_icon"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintLeft_toRightOf="@+id/rank_like"
+        app:layout_constraintRight_toLeftOf="@+id/rank_reply"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img" />
+
+    <TextView
+        android:id="@+id/rank_reply"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toRightOf="@+id/reply_icon"
+        app:layout_constraintRight_toLeftOf="@+id/view_icon"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="1"
+        />
+
+    <ImageView
+        android:id="@+id/view_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/view_icon"
+        android:layout_marginTop="6dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toRightOf="@+id/rank_reply"
+        app:layout_constraintRight_toLeftOf="@+id/rank_see"
+        />
+
+    <TextView
+        android:id="@+id/rank_see"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toRightOf="@+id/view_icon"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="1"
+        />
+
+    <Button
+        android:id="@+id/btnDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="확인"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp"
+        app:backgroundTint="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rank_see"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

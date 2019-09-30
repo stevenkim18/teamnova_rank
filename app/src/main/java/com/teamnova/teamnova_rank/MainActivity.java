@@ -184,15 +184,17 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
+    //리사이클러뷰 목록에 있는 작품 아이템을 선택하면 자세하게 보여주는 다이어로그
     private void showAlertDialog(int layout){
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
         View layoutView = getLayoutInflater().inflate(layout, null);
-        Button dialogButton = layoutView.findViewById(R.id.btnDialog);
+        Button dialogButton = layoutView.findViewById(R.id.btnDialog); //다이어로그 btnDialog레이아웃보여준다
         dialogBuilder.setView(layoutView);
-        alertDialog = dialogBuilder.create();
-        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        alertDialog = dialogBuilder.create(); //다이어로그 생성
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         alertDialog.show();
+        //확인 버튼 클릭시 다이어로그 사라짐
         dialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -288,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //테스트하기위해서 만든 메소드입니다 
+    //테스트하기위해서 만든 메소드입니다
     private void makeTestData(){
 
         mRankData = new ArrayList<>();

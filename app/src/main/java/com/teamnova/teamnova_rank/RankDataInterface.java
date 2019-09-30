@@ -40,4 +40,6 @@ public interface RankDataInterface {
     // 기초 응용 2단계의 작품 목록만 가져온다.
     List<RankData> selectHardStep2List();
 
+    // 개인별 평균 점수 목록
+    List<RankData> selectIndividualRankList();
 }

@@ -3,18 +3,27 @@ package com.teamnova.teamnova_rank;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,8 +43,12 @@ public class MainActivity extends AppCompatActivity {
     //mainToolbar:메인액티비티에서 사용하는 툴바
     private Toolbar mainToolbar;
 
+    private ArrayList<RankData> mRankData;
 
-    // 슬랙 깃허브 연동 테스트
+    AlertDialog alertDialog;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -52,7 +65,20 @@ public class MainActivity extends AppCompatActivity {
         mainToolbar = findViewById(R.id.main_toolbar);
         mainToolbar.setTitle(""); //메인 툴바에 나오는 앱 제목을 지우기 위해 공백으로 표현
 
+        makeTestData();
+
+        RankRecyclerview = findViewById(R.id.rank_recyclerview);
         setSupportActionBar(mainToolbar);//메인 액티비티에서 툴바를 사용하기 위해
+
+
+        LinearLayoutManager llm = new LinearLayoutManager(this);//종류는 총 3가지, ListView를 사용하기 위한 사용
+        RankRecyclerview.setHasFixedSize(true);//각 아이템이 보여지는 것을 일정하게
+        RankRecyclerview.setLayoutManager(llm);//앞서 선언한 리싸이클러뷰를 레이아웃메니저에 붙힌다
+
+
+        RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter(mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+        RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
+        RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
 
 
         //메인 자바버튼 클릭한 경우
@@ -60,16 +86,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+
+
                 switch (view.getId()) {
                     //자바버튼만 selected(선택)되어서 자바버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_java_step_btn:
                         mainJavaStepBtn.setSelected(true);
+//                        mainJavaStepBtn.setClickable(false);
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
                 }
+
+
+
             }
         });
 
@@ -144,6 +176,30 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    RankRecyclerviewAdapter.OnclickItemListener onClickItemListener = new RankRecyclerviewAdapter.OnclickItemListener() {
+        @Override
+        public void clickDetaiInfo(RankData rankData) {
+            showAlertDialog(R.layout.dialog_rank_description);
+        }
+    };
+
+
+    private void showAlertDialog(int layout){
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        View layoutView = getLayoutInflater().inflate(layout, null);
+        Button dialogButton = layoutView.findViewById(R.id.btnDialog);
+        dialogBuilder.setView(layoutView);
+        alertDialog = dialogBuilder.create();
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alertDialog.show();
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
+    }
 
     //메인 툴바에 사용하기위한 옵션메뉴를 생성합니다
     @Override
@@ -159,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             //검색버튼을 클릭한경우
             case R.id.main_search:
+
                 Toast.makeText(getApplicationContext(), "검색하기", Toast.LENGTH_SHORT).show();
                 return true;
 
@@ -212,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
         builder.show(); //다이어로그 보여주기
     }
 
-
     //목록다이어로그에서 작품 순위 산정 기준을 선택했을 때 보여주는 다이어로그
     public void standardDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);//다이어로그 생성해줍니다
@@ -230,4 +286,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
+    //테스트하기위해서 만든 메소드입니다 
+    private void makeTestData(){
+
+        mRankData = new ArrayList<>();
+
+//      mRankData.add(new RankData(rankID,rankTitle,rankWriter,createDate,detailLink,thumbPath,viewCount,likeCount,replyCount,rankType,ranking,rankPoint));
+
+        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 0));
+        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 0));
+        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,3, 0));
+        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,4, 0));
+        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 0));
+        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 0));
+
+
+    }
 }

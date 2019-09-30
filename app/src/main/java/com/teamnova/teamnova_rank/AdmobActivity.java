@@ -550,7 +550,7 @@ public class AdmobActivity extends AppCompatActivity {
             int like_count = Integer.parseInt(broad_list.get(i).getElementsByClass("u_cnt num-recomm").text());
 
             //게시글 url
-            String post_url = "https://cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
+            String post_url = "https://m.cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
 
             Document image_tag = Jsoup.parse(broad_list.get(i).getElementsByClass("movie-img").html());
 

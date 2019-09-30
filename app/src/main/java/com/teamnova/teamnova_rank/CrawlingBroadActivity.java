@@ -161,7 +161,7 @@ public class CrawlingBroadActivity extends AppCompatActivity {
             Log.v(TAG, "좋아요수: " + broad_list.get(i).getElementsByClass("u_cnt num-recomm").text());
 
             //게시글 url
-            String post_url = "https://cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
+            String post_url = "https://m.cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
             Log.v(TAG, "게시글 태그: " + post_url);
 
             Document image_tag = Jsoup.parse(broad_list.get(i).getElementsByClass("movie-img").html());

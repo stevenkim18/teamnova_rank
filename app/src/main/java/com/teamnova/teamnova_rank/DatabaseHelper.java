@@ -58,7 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private final int RANK_TYPE_HARD_2 = 4;
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 5;      // 버전 5
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -131,6 +131,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         db.execSQL(CREATE_CRAWL_SCHEME_TABLE);
     }
 
+    // 버전
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME_RANK);

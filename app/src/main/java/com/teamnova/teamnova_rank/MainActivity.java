@@ -41,8 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
+        
         mainJavaStepBtn = findViewById(R.id.main_java_step_btn);
         mainAndroidStepBtn = findViewById(R.id.main_android_step_btn);
         mainPhpStepBtn = findViewById(R.id.main_php_step_btn);

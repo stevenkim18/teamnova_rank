@@ -1,12 +1,15 @@
 package com.teamnova.teamnova_rank;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * 클래스명 : RankData class
  * 설명 : 팀노바 오픈 카페(https://cafe.naver.com/teamnovaopen) - 팀노바 작품 동영상의 게시물 목록을 크롤링한 데이터가 담긴다.
  *
  * 참조 : https://trello.com/b/i59vsfKE/scstnghks - 규칙 - 데이터 모델 구조 카드
  */
-public class RankData {
+public class RankData implements Parcelable {
 
     /**
      * sqlLite에 저장시 autoincrement되는 정보
@@ -57,7 +60,7 @@ public class RankData {
      * @param replyCount 댓글 개수
      * @param rankType 작품 단계(기초, ..., 응용1, 응용2)
      */
-    public RankData(String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath, int viewCount, int likeCount, int replyCount, int rankType) {
+/*    public RankData(String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath, int viewCount, int likeCount, int replyCount, int rankType) {
         this.rankTitle = rankTitle;
         this.rankWriter = rankWriter;
         this.createDate = createDate;
@@ -67,7 +70,7 @@ public class RankData {
         this.likeCount = likeCount;
         this.replyCount = replyCount;
         this.rankType = rankType;
-    }
+    }*/
 
     public RankData(int rankID, String rankTitle, String rankWriter, String createDate, String detailLink, String thumbPath, int viewCount, int likeCount, int replyCount, int rankType, int ranking, int rankPoint) {
         this.rankID = rankID;
@@ -83,6 +86,54 @@ public class RankData {
         this.ranking = ranking;
         this.rankingPoint = rankPoint;
     }
+
+    protected RankData(Parcel in) {
+        rankID = in.readInt();
+        rankTitle = in.readString();
+        rankWriter = in.readString();
+        createDate = in.readString();
+        detailLink = in.readString();
+        thumbPath = in.readString();
+        viewCount = in.readInt();
+        likeCount = in.readInt();
+        replyCount = in.readInt();
+        rankType = in.readInt();
+        rankingPoint = in.readInt();
+        ranking = in.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(rankID);
+        dest.writeString(rankTitle);
+        dest.writeString(rankWriter);
+        dest.writeString(createDate);
+        dest.writeString(detailLink);
+        dest.writeString(thumbPath);
+        dest.writeInt(viewCount);
+        dest.writeInt(likeCount);
+        dest.writeInt(replyCount);
+        dest.writeInt(rankType);
+        dest.writeInt(rankingPoint);
+        dest.writeInt(ranking);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<RankData> CREATOR = new Creator<RankData>() {
+        @Override
+        public RankData createFromParcel(Parcel in) {
+            return new RankData(in);
+        }
+
+        @Override
+        public RankData[] newArray(int size) {
+            return new RankData[size];
+        }
+    };
 
     public int getRankingPoint() {
         return rankingPoint;

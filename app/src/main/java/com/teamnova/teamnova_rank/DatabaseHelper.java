@@ -6,6 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -42,23 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     }
 
 
-    /*
-     * 단계별 목록을 DB에서 가져올때 RnakData class의 rankType 변수 숫자별 의미
-     *
-     * 0 : 기초 자바 작품
-     * 1 : 기초 안드로이드 작품
-     * 2 : 기초 PHP 작품
-     * 3 : 응용 1단계 작품
-     * 4 : 응용 2단계 작품
-     */
-    private final int RANK_TYPE_BASIC_JAVA = 0;
-    private final int RANK_TYPE_BASIC_ANDROID = 1;
-    private final int RANK_TYPE_BASIC_PHP = 2;
-    private final int RANK_TYPE_HARD_1 = 3;
-    private final int RANK_TYPE_HARD_2 = 4;
-
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 58;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -78,11 +64,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     private static final String RANK_REPLY_COUNT = "REPLY_COUNT"; //댓글 개수
     private static final String RANK_RANKING = "RANKING"; //랭킹
     private static final String RANK_TYPE = "TYPE";  //작품 단계(기초, ..., 응용1, 응용2)
+    private static final String RANK_RANK_POINT = "RANK_POINT";  //작품 단계(기초, ..., 응용1, 응용2)
+
 
     // CRAWL_DATE_TB
-    private static final String CRAWL_SCHEME_CRAWL_ID = "CRAWL_ID";
-    private static final String CRAWL_SCHEME_CRAWL_DATE = "CRAWL_DATE";
-
+    private static final String CRAWL_SCHEME_CRAWL_ID = "CRAWL_ID"; // 식별 문자
+    private static final String CRAWL_SCHEME_CRAWL_DATE = "CRAWL_DATE"; // 크롤링한 날짜
+    private static final String CRAWL_SCHEME_CRAWL_SUCCESS = "CRAWL_SUCCESS"; // 크롤링 성공 여부 0:실패, 1:성공
+    private static final String CRAWL_SCHEME_CRAWL_COURSE_TYPE = "CRAWL_COURSE_TYPE"; // 크롤링 데이터 유형
 
     /* 테이블 생성 쿼리 */
     // RANK_INFO_TB 생성
@@ -98,14 +87,17 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                     RANK_LIKE_COUNT + " INTEGER, " +
                     RANK_REPLY_COUNT + " INTEGER, " +
                     RANK_RANKING + " INTEGER, " +
-                    RANK_TYPE + " INTEGER " +
+                    RANK_TYPE + " INTEGER, " +
+                    RANK_RANK_POINT + " INTEGER " +
                     ")";
 
     // CRAWL_DATE_TB 생성
     private static final String CREATE_CRAWL_SCHEME_TABLE =
             "CREATE TABLE " + TABLE_NAME_CRAWL_SCHEME + "(" +
                     CRAWL_SCHEME_CRAWL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    CRAWL_SCHEME_CRAWL_DATE + " TEXT " +
+                    CRAWL_SCHEME_CRAWL_DATE + " TEXT ," +
+                    CRAWL_SCHEME_CRAWL_SUCCESS + " INTEGER ," +
+                    CRAWL_SCHEME_CRAWL_COURSE_TYPE + " INTEGER " +
                     ")";
 
     public DatabaseHelper(@Nullable Context context) {
@@ -135,8 +127,80 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         onCreate(db);
     }
 
-    // 오늘 날짜로 크롤링한 기록이 있는지 확인한다.
+    /**
+     * 광고 시청을 중간에 취소할 경우 크롤링을 완료 여부를 false로 바꾼다.
+     * @param updateList
+     */
+    public void updateCrawlScheme(List<Integer> updateList, boolean isSuccess){
 
+        String query = "UPDATE " +
+                                TABLE_NAME_CRAWL_SCHEME +
+                        " SET " +
+                                CRAWL_SCHEME_CRAWL_SUCCESS + " = " + (isSuccess ? 1 : 0) +
+                        " WHERE " +
+                                 CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
+                                " AND " + CRAWL_SCHEME_CRAWL_COURSE_TYPE + " IN ("+ TextUtils.join(",",updateList) +") ";
+        database.execSQL(query);
+//        String whereQuery = CRAWL_SCHEME_CRAWL_DATE + " = ? AND "+CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = ?";
+
+//        ContentValues contentValues = new ContentValues();
+//        contentValues.put(CRAWL_SCHEME_CRAWL_SUCCESS,0);
+//        database.update(TABLE_NAME_CRAWL_SCHEME,contentValues,whereQuery,new String[]{"strftime('%Y-%m-%d','now', 'localtime')",COURSE_TYPE+""});
+        Log.d(TAG,"updateCrawlScheme 실행"+query);
+    }
+
+    /**
+     * 해당 단계를 같은 날짜에 크롤링한 결과가 있는지 반환한다.
+     *
+     * ex)
+     * --------------------------------------------------
+     * SELECT
+     * 	    COUNT(*)
+     * FROM
+     * 	    CRAWL_SCHEME_TB
+     * WHERE
+     * 	    CRAWL_DATE = strftime('%Y-%m-%d','now', 'localtime')
+     * 	    AND CRAWL_SUCCESS = 1
+     * 	    AND CRAWL_COURSE_TYPE = 5
+     * --------------------------------------------------
+     *
+     * @return true : 이미 크롤링함, false : 크롤링한 기록이 없음
+     *
+     */
+    public boolean selectCrawlScheme(final int COURSE_TYPE){
+        String query = "SELECT "+
+                                "COUNT(*) " +
+                        " FROM "+
+                                TABLE_NAME_CRAWL_SCHEME +
+                        " WHERE " +
+                                CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
+                                "AND "+ CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
+                                "AND "+ CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = "+ COURSE_TYPE;
+
+        Cursor cursor = database.rawQuery(query,null);
+        cursor.moveToFirst();
+        boolean result = cursor.getInt(0) > 0 ? true : false;
+
+        Log.d(TAG, "selectCrawlScheme 쿼리 : "+query);
+        Log.d(TAG, "결과 : "+result);
+        return result;
+    }
+
+    /**
+     * 단계별 크롤링 완료 후 크롤링 성공 여부 및 날짜등을 기록한다.
+     * > 같은 날짜에 기록이 있는경우 크롤링을 하지 않고 DB에서 정보를 찾기 위함
+     *
+     * @param COURSE_TYPE : 코스 단계
+     * @param IS_SUCCESS : 성공 여부
+     */
+    public void insertCrawlScheme(int COURSE_TYPE, boolean IS_SUCCESS){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CRAWL_SCHEME_CRAWL_DATE               ,DateUtil.getToday());
+        contentValues.put(CRAWL_SCHEME_CRAWL_SUCCESS            ,IS_SUCCESS ? 1 : 0);
+        contentValues.put(CRAWL_SCHEME_CRAWL_COURSE_TYPE        ,COURSE_TYPE);
+
+        database.insert(TABLE_NAME_CRAWL_SCHEME, null, contentValues);
+    }
 
     /**
      * 해당 타입 목록 모두 삭제
@@ -172,6 +236,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         contentValues.put(RANK_LIKE_COUNT     ,likeCount);
         contentValues.put(RANK_REPLY_COUNT    ,replyCount);
         contentValues.put(RANK_TYPE           ,rankType);
+        contentValues.put(RANK_RANK_POINT     ,viewCount + (likeCount * 5));
 
         //데이터 목록 등록
         database.insert(TABLE_NAME_RANK, null, contentValues);
@@ -184,7 +249,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicJavaStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_JAVA);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_JAVA);
     }
 
     /**
@@ -193,7 +258,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicAndroidStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_ANDROID);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_ANDROID);
     }
 
     /**
@@ -202,7 +267,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectBasicPhpStepList() {
-        return selectRankListByType(RANK_TYPE_BASIC_PHP);
+        return selectRankListByType(Constant.RANK_TYPE_BASIC_PHP);
     }
 
     /**
@@ -211,7 +276,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectHardStep1List() {
-        return selectRankListByType(RANK_TYPE_HARD_1);
+        return selectRankListByType(Constant.RANK_TYPE_HARD_1);
     }
 
     /**
@@ -220,11 +285,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     @Override
     public List<RankData> selectHardStep2List() {
-        return selectRankListByType(RANK_TYPE_HARD_2);
+        return selectRankListByType(Constant.RANK_TYPE_HARD_2);
     }
 
     /**
      * 단계별로 작품 목록을 가져온다.
+     *
      * @param TYPE_STEP : 작품의 단계
      * @return
      */
@@ -245,7 +311,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                                 "LIKE_COUNT ,"+
                                 "REPLY_COUNT ,"+
                                 "TYPE ,"+
-                                "RANK_ID "+
+                                "RANK_ID ,"+
+                                "RANK_POINT "+
                         " FROM " +
                                 TABLE_NAME_RANK +" RANK " +
                         " WHERE " +
@@ -256,10 +323,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         Log.d(TAG, "쿼리 : "+query);
 
         Cursor cursor = database.rawQuery(query,null);
-        int ranking = 1;
+        int index = 1;
         while(cursor.moveToNext()){
 //            int ranking         = cursor.getInt(0);
-            int index           = ranking;
+            int ranking           = index;
             String title        = cursor.getString(1);
             String writer       = cursor.getString(2);
             String create_date  = cursor.getString(3);
@@ -270,10 +337,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
             int reply_count     = cursor.getInt(8);
             int type            = cursor.getInt(9);
             int rankId          = cursor.getInt(10);
+            int rankPoint       = cursor.getInt(11);
 
-            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking);
+            RankData rankData = new RankData(rankId, title, writer, create_date, detail_link, thumb_path, view_count, like_count, reply_count, type, ranking, rankPoint);
             resultList.add(rankData);
-            ranking++;
+            index++;
         }
         return resultList;
     }

@@ -1,6 +1,7 @@
 package com.teamnova.teamnova_rank;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -179,6 +180,15 @@ public class AdmobActivity extends AppCompatActivity {
                     Log.d(TAG, "The rewarded ad wasn't loaded yet.");
                     Toast.makeText(AdmobActivity.this, "광고 로딩중입니다.", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        noUpdateTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdmobActivity.this,MainActivity.class);
+                startActivity(intent);
+
             }
         });
     }

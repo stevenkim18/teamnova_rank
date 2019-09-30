@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/dialog_round_background"
-    tools:context=".MainActivity">
+    tools:context=".RankDescriptionActivity">
 
     <ImageView
         android:id="@+id/thumb_path_img"
@@ -105,11 +105,11 @@
         android:layout_marginTop="6dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
         app:layout_constraintLeft_toRightOf="@+id/rank_reply"
-        app:layout_constraintRight_toLeftOf="@+id/rank_see"
+        app:layout_constraintRight_toLeftOf="@+id/rank_view"
         />
 
     <TextView
-        android:id="@+id/rank_see"
+        android:id="@+id/rank_view"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
@@ -139,6 +139,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rank_see"/>
+        app:layout_constraintTop_toBottomOf="@+id/rank_view"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

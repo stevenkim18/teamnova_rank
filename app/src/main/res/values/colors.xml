@@ -3,8 +3,7 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-
-    <color name="lineColor">#B2B2B2</color>
+    <color name="teamnovaYellow">#F1E850</color>
 
     <color name="colorGray0">#f8f9fa</color>
     <color name="colorGray1">#f1f3f5</color>

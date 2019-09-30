@@ -1,6 +1,10 @@
 package com.teamnova.teamnova_rank;
 
 import android.app.Activity;
+import android.content.Context;
+import android.os.Build;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +20,16 @@ import com.airbnb.lottie.LottieAnimationView;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
+
 public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclerviewAdapter.MyViewholder>{
 
 
     private List<RankData> rankDataList; //랭크데이터 리스트 변수
     private OnclickItemListener onClickItemListener;
+
+    private Context context;
+    private Boolean isToolTipshowed;
 
 
     //아이템 을 클릭했을때 onClickItemListener메소드 실행
@@ -29,8 +38,10 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
         this.onClickItemListener = onClickItemListener;
     }
 
-    public RankRecyclerviewAdapter(List<RankData> rank_data_list) {
+    public RankRecyclerviewAdapter(Context context, List<RankData> rank_data_list) {
         this.rankDataList = rank_data_list;
+        this.context = context;
+        isToolTipshowed = true;
     }
 
     public interface OnclickItemListener{
@@ -118,7 +129,6 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
             holder.silverLottieAnimation.setVisibility(View.INVISIBLE);
             holder.brownLottieAnimation.setVisibility(View.INVISIBLE);
 
-
         }
         //랭킹이 2위인 작품을 보여줄 때 로띠중에서 은색트로피 로띠만 보이도록 합니다
         else if(data.getRanking()==2){
@@ -137,7 +147,9 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
         //앞서 뷰홀더에 세팅해준 것을 각 위치에 맞는 것들로 보여주게 하기 위해서 세팅해준다.
         holder.rankTitle.setText(data.getRankTitle()); //제목 보여주기
         holder.rankPoint.setText(data.getRankingPoint()+"");//점수 보여주기
-
+        if(position == 0){
+            showTooltip(holder.rankPoint, isToolTipshowed);
+        }
 
 
         //랭크목록에 있는 아이템을 선택했을때
@@ -150,7 +162,25 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
 
 //      holder.rank_image.setImageURI(data.get());
 
+    }
 
+    // toolTip을 보여줌.
+    private void showTooltip(View view, Boolean isToolTipshowed){
+
+        // 처음에 툴팁을 한번만 보여주기 위해서 사용.
+        this.isToolTipshowed = false;
+
+        if(isToolTipshowed){
+            new SimpleTooltip.Builder(context)
+                    .anchorView(view)
+                    .text("Ranking Point")                 // 툴팁 메시지
+                    .gravity(Gravity.TOP)                  // 툴팁 방향
+                    .animated(true)
+                    .transparentOverlay(false)             // 배경을 회색으로 할껀지
+                    .build()
+                    .show();
+
+        }
 
     }
 }

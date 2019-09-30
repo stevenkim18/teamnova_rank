@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
         mainToolbar = findViewById(R.id.main_toolbar);
-        mainToolbar.setTitle(""); //메인 툴바에 나오는 앱 제목을 지우기 위해 공백으로 표현
 
         makeTestData();
 
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         RankRecyclerview.setLayoutManager(llm);//앞서 선언한 리싸이클러뷰를 레이아웃메니저에 붙힌다
 
 
-        RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter(mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+        RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
 
@@ -296,13 +295,22 @@ public class MainActivity extends AppCompatActivity {
 
 //      mRankData.add(new RankData(rankID,rankTitle,rankWriter,createDate,detailLink,thumbPath,viewCount,likeCount,replyCount,rankType,ranking,rankPoint));
 
-        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 0));
-        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 0));
-        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,3, 0));
-        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,4, 0));
-        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 0));
-        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 0));
-
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 1000));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 900));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,3, 800));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,4, 700));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 600));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 500));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,7, 400));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,8, 300));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,9, 200));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,10, 999));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,11, 10));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,12, 78));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,13, 1));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,14, 45));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,15, 9));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,16, 9999));
 
     }
 }

@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 62;
+    private static final int DATABASE_VERSION = 67;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -127,6 +127,31 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         onCreate(db);
     }
 
+
+    /**
+     * 마지막 업데이트 날짜를 가져온다.
+     * @return
+     */
+    public String selectLastUpdateDate(){
+        String query = "";
+        query = "SELECT " +
+                        CRAWL_SCHEME_CRAWL_DATE +
+                " FROM " +
+                        TABLE_NAME_CRAWL_SCHEME +
+                " GROUP BY " +
+                        CRAWL_SCHEME_CRAWL_DATE +
+                " HAVING " +
+                        "COUNT("+CRAWL_SCHEME_CRAWL_DATE+") == 5";
+
+        Cursor cursor = database.rawQuery(query,null);
+        String result = "";
+        if(cursor != null && cursor.moveToFirst()){
+            result = cursor.getString(cursor.getColumnIndex(CRAWL_SCHEME_CRAWL_DATE));
+            cursor.close();
+        }
+        return result;
+    }
+
     /**
      * 오늘 일자의 크롤링이 모두 완료되었는지 확인한다.
      * @return true : 크롤링 모두 완료, false : 최신 데이터가 아니라 크롤링 필요
@@ -142,6 +167,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                                 TABLE_NAME_CRAWL_SCHEME+
                         " WHERE " +
                                 CRAWL_SCHEME_CRAWL_DATE +" = strftime('%Y-%m-%d','now', 'localtime')" +
+                                " AND " + CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
                         " GROUP BY " +
                                 CRAWL_SCHEME_CRAWL_COURSE_TYPE +")";
 
@@ -269,6 +295,50 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         //데이터 목록 등록
         database.insert(TABLE_NAME_RANK, null, contentValues);
 
+    }
+
+    /**
+     * 개인별 작품 평균 점수로 순위를 매긴 목록을 반환한다.
+     * @return
+     */
+    @Override
+    public List<RankData> selectIndividualRankList() {
+        List<RankData> resultList = new ArrayList<>();
+        String query = "";
+        query = "SELECT " +
+                        RANK_WRITER +
+                        ", (SELECT "+
+                                RANK_THUMB_PATH+
+                            " FROM "+
+                                TABLE_NAME_RANK+" T "+
+                            "WHERE "+
+                                "T."+RANK_WRITER+" = RIT."+RANK_WRITER+
+                            " GROUP BY "+
+                                RANK_WRITER+
+                            " HAVING MAX("+RANK_RANK_POINT+")) AS "+RANK_THUMB_PATH +
+                        ", SUM("+RANK_RANK_POINT+")/COUNT("+RANK_WRITER+") AS "+RANK_RANK_POINT+
+                        ",COUNT("+RANK_RANK_ID+") AS WORK_COUNT"+
+                " FROM " +
+                        TABLE_NAME_RANK+
+                " GROUP BY "+
+                        RANK_WRITER+
+                " ORDER BY "+
+                        "SUM("+RANK_RANK_POINT+")/COUNT("+RANK_WRITER+") DESC";
+
+
+        Log.d(TAG, "selectIndividualRankList 쿼리 : "+query);
+
+        Cursor cursor = database.rawQuery(query,null);
+        int index = 1;
+        while(cursor.moveToNext()){
+            RankData rankData = new RankData();
+            rankData.setRanking(index++);
+            rankData.setRankWriter(cursor.getString(0));
+            rankData.setThumbPath(cursor.getString(1));
+            rankData.setRankingPoint(cursor.getInt(2));
+            resultList.add(rankData);
+        }
+        return resultList;
     }
 
     /**

@@ -35,13 +35,13 @@ public class RankDescriptionActivity extends Dialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rank_description);
+//        setContentView(R.layout.activity_rank_description);
 
 
         rankName = findViewById(R.id.rank_name);
         rankLike = findViewById(R.id.rank_like);
         rankReply = findViewById(R.id.rank_reply);
-        rankView = findViewById(R.id.rank_view);
+//        rankView = findViewById(R.id.rank_view);
 
 
 //        rankData = getIntent().getParcelableExtra("rankData");

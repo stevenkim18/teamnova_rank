@@ -92,7 +92,7 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
             rankName = itemview.findViewById(R.id.rank_name);
             rankLike = itemview.findViewById(R.id.rank_like);
             rankReply = itemview.findViewById(R.id.rank_reply);
-            rankView = itemview.findViewById(R.id.rank_view);
+//            rankView = itemview.findViewById(R.id.rank_view);
 
 
         }

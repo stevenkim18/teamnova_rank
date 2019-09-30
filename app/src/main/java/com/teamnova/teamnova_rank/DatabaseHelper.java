@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 59;
+    private static final int DATABASE_VERSION = 62;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -125,6 +125,34 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME_RANK);
         db.execSQL("DROP TABLE IF EXISTS "+TABLE_NAME_CRAWL_SCHEME);
         onCreate(db);
+    }
+
+    /**
+     * 오늘 일자의 크롤링이 모두 완료되었는지 확인한다.
+     * @return true : 크롤링 모두 완료, false : 최신 데이터가 아니라 크롤링 필요
+     */
+    public boolean isCompleteCrawling(){
+        String query = "";
+        query = "SELECT "  +
+                        "CASE WHEN COUNT(*) = 5 THEN 1 ELSE 0 END AS RESULT" +
+                " FROM " +
+                        "(SELECT " +
+                                    CRAWL_SCHEME_CRAWL_COURSE_TYPE +
+                        " FROM " +
+                                TABLE_NAME_CRAWL_SCHEME+
+                        " WHERE " +
+                                CRAWL_SCHEME_CRAWL_DATE +" = strftime('%Y-%m-%d','now', 'localtime')" +
+                        " GROUP BY " +
+                                CRAWL_SCHEME_CRAWL_COURSE_TYPE +")";
+
+
+        Cursor cursor = database.rawQuery(query,null);
+        cursor.moveToFirst();
+        boolean result = cursor.getInt(0) > 0 ? true : false;
+
+        Log.d(TAG, "isCompleteCrawling 쿼리 : "+query);
+        Log.d(TAG, "결과 : "+result);
+        return result;
     }
 
     /**

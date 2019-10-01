@@ -73,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
             = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     boolean isJavaComplete = false;
+    boolean isAndroidComplete = false;
+    boolean isPHPComplete = false;
+    boolean isHard1Complete = false;
+    boolean isHard2Complete = false;
+
     int javaCrawlUrlLength = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,11 +93,6 @@ public class MainActivity extends AppCompatActivity {
         mainPhpStepBtn = findViewById(R.id.main_php_step_btn);
         mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
-
-/*        rankName = findViewById(R.id.rank_name);
-        rankLike = findViewById(R.id.rank_like);
-        rankReply = findViewById(R.id.rank_reply);
-        rankView = findViewById(R.id.rank_view);*/
 
         mainToolbar = findViewById(R.id.main_toolbar);
 
@@ -116,25 +116,32 @@ public class MainActivity extends AppCompatActivity {
             jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
             jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                 @Override
-                public void onProgressUpdate(final Integer integer, Document document) {
-                    javaCrawlUrlLength ++;
-                    JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,0,databaseHelper);
+                public void onProgressUpdate(Integer integer, Document document) {
+
+                    if(integer == -1){
+                        isJavaComplete = true;
+                    }else{
+                        javaCrawlUrlLength ++;
+                    }
+                    JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_JAVA,databaseHelper);
                     jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                         @Override
                         public void onPostExecute() {
                             javaCrawlUrlLength--;
-                            if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 0){
+                            if(isJavaComplete && javaCrawlUrlLength == 0 && currentNum == 0){
                                 // 크롤링 성공 저장
-                                databaseHelper.insertCrawlScheme(currentNum, true);
+                                databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA, true);
                                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                                 RankRecyclerviewAdapter.notifyDataSetChanged();
                             }
                         }
                     });
+                    if(!isJavaComplete)
                     jsoupPageCrawler.executeOnExecutor(executor);
                 }
             });
-            jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+            jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_JAVA);
+//            jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
         }else{
             mRankData = databaseHelper.selectBasicJavaStepList();
         }
@@ -199,23 +206,29 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
-                        public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isAndroidComplete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_ANDROID,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 1){
+                                    if(isAndroidComplete && javaCrawlUrlLength == 0 && currentNum == 1){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_ANDROID, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
+                            if(!isAndroidComplete)
                             jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_ANDROID);
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);
@@ -259,23 +272,30 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
-                        public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isPHPComplete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_PHP,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 2){
+                                    if(isPHPComplete && javaCrawlUrlLength == 0 && currentNum == Constant.RANK_TYPE_BASIC_PHP){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_PHP, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
+                            if(!isPHPComplete)
                             jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_PHP);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_PHP);
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);
@@ -316,23 +336,30 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
-                        public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isHard1Complete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_HARD_1,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 3){
+                                    if(isHard1Complete && javaCrawlUrlLength == 0 && currentNum == 3){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_1, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
+                            if(!isHard1Complete)
                             jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_1);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_1);
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);
@@ -376,22 +403,30 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
                         public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                            if(integer == -1){
+                                isHard2Complete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_HARD_2,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 4){
+                                    if(isHard2Complete && javaCrawlUrlLength == 0 && currentNum == 4){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_2, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
+                            if(!isHard2Complete)
                             jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_2);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_2);
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);

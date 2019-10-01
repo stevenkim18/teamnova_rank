@@ -28,4 +28,15 @@
         app:layout_constraintStart_toStartOf="@+id/rank_loading_av"
         app:layout_constraintTop_toBottomOf="@+id/rank_loading_av" />
 
+    <TextView
+        android:id="@+id/ad_recommend_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="오래 걸리는데... 광고 한편 보실래요?"
+        android:textColor="#FFFFFFFF"
+        app:layout_constraintEnd_toEndOf="@+id/rank_loading_alert_tv"
+        app:layout_constraintStart_toStartOf="@+id/rank_loading_alert_tv"
+        app:layout_constraintTop_toBottomOf="@+id/rank_loading_alert_tv" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

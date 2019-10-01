@@ -36,16 +36,26 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    //mainJavaStepBtn:mainJavaStepBtn을 클릭하면 자바 작품들이 RankRecyclerview에 보인다.
+    //mainAndroidStepBtn:mainAndroidStepBtn을 클릭하면 안드로이드 작품들이 RankRecyclerview에 보인다.
+    //mainPhpStepBtn:mainPhpStepBtn을 클릭하면 PHP 작품들이 RankRecyclerview에 보인다.
+    //mainHard1StepBtn:mainHard1StepBtn을 클릭하면 응용1단계 작품들이 RankRecyclerview에 보인다.
+    //mainHard2StepBtn:mainHard2StepBtn을 클릭하면 응용2단계 작품들이 RankRecyclerview에 보인다.
     private Button mainJavaStepBtn, mainAndroidStepBtn, mainPhpStepBtn, mainHard1StepBtn,
             mainHard2StepBtn;
 
+    private TextView rankView,rankName,rankLike,rankReply;
+    //RankRecyclerview:선택한 작품들을 보여주는 리사이클러뷰
     private RecyclerView RankRecyclerview;
 
+    //mainToolbar:메인액티비티에서 사용하는 툴바
     private Toolbar mainToolbar;
 
     private List<RankData> mRankData;
 
     private RankDescriptionActivity alertDialog ;
+//    AlertDialog alertDialog;
 
     /* sqlDB */
     private DatabaseHelper databaseHelper;
@@ -63,6 +73,11 @@ public class MainActivity extends AppCompatActivity {
             = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     boolean isJavaComplete = false;
+    boolean isAndroidComplete = false;
+    boolean isPHPComplete = false;
+    boolean isHard1Complete = false;
+    boolean isHard2Complete = false;
+
     int javaCrawlUrlLength = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,23 +88,22 @@ public class MainActivity extends AppCompatActivity {
         /* sqldbHelper */
         databaseHelper = DatabaseHelper.getInstance(this);
 
-        mainJavaStepBtn = findViewById(R.id.main_java_step_btn);//mainJavaStepBtn:mainJavaStepBtn을 클릭하면 자바 작품들이 RankRecyclerview에 보인다.
-        mainAndroidStepBtn = findViewById(R.id.main_android_step_btn);//mainAndroidStepBtn:mainAndroidStepBtn을 클릭하면 안드로이드 작품들이 RankRecyclerview에 보인다.
-        mainPhpStepBtn = findViewById(R.id.main_php_step_btn);//mainPhpStepBtn:mainPhpStepBtn을 클릭하면 PHP 작품들이 RankRecyclerview에 보인다.
-        mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);//mainHard1StepBtn:mainHard1StepBtn을 클릭하면 응용1단계 작품들이 RankRecyclerview에 보인다.
-        mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn); //mainHard2StepBtn:mainHard2StepBtn을 클릭하면 응용2단계 작품들이 RankRecyclerview에 보인다.
+        mainJavaStepBtn = findViewById(R.id.main_java_step_btn);
+        mainAndroidStepBtn = findViewById(R.id.main_android_step_btn);
+        mainPhpStepBtn = findViewById(R.id.main_php_step_btn);
+        mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
+        mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
-        mainToolbar = findViewById(R.id.main_toolbar);  //mainToolbar:메인액티비티에서 사용하는 툴바
+        mainToolbar = findViewById(R.id.main_toolbar);
 
-        mainJavaStepBtn.setSelected(true);//앱이 첫 실행할 때 자바버튼 눌러져있도록 보이기위해
-        RankRecyclerview = findViewById(R.id.rank_recyclerview);//RankRecyclerview:선택한 작품들을 보여주는 리사이클러뷰
+        mainJavaStepBtn.setSelected(true);
+        RankRecyclerview = findViewById(R.id.rank_recyclerview);
         setSupportActionBar(mainToolbar);//메인 액티비티에서 툴바를 사용하기 위해
 
 
-        LinearLayoutManager llm = new LinearLayoutManager(this);//종류는 총 3가지, LinearLayoutManager을 사용하기 위한 사용
+        LinearLayoutManager llm = new LinearLayoutManager(this);//종류는 총 3가지, ListView를 사용하기 위한 사용
         RankRecyclerview.setHasFixedSize(true);//각 아이템이 보여지는 것을 일정하게
         RankRecyclerview.setLayoutManager(llm);//앞서 선언한 리싸이클러뷰를 레이아웃메니저에 붙힌다
-
 
         /* 데이터를 저장한 기록이 있는지 확인한다. */
         String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_BASIC_JAVA);
@@ -100,29 +114,35 @@ public class MainActivity extends AppCompatActivity {
             jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
             jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                 @Override
-                public void onProgressUpdate(final Integer integer, Document document) {
-                    javaCrawlUrlLength ++;
-                    JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,0,databaseHelper);
+                public void onProgressUpdate(Integer integer, Document document) {
+
+                    if(integer == -1){
+                        isJavaComplete = true;
+                    }else{
+                        javaCrawlUrlLength ++;
+                    }
+                    JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_JAVA,databaseHelper);
                     jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                         @Override
                         public void onPostExecute() {
                             javaCrawlUrlLength--;
-                            if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 0){
+                            if(isJavaComplete && javaCrawlUrlLength == 0 && currentNum == 0){
                                 // 크롤링 성공 저장
-                                databaseHelper.insertCrawlScheme(currentNum, true);
+                                databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA, true);
                                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                                 RankRecyclerviewAdapter.notifyDataSetChanged();
                             }
                         }
                     });
-                    jsoupPageCrawler.executeOnExecutor(executor);
+                    if(!isJavaComplete)
+                        jsoupPageCrawler.executeOnExecutor(executor);
                 }
             });
-            jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+            jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_JAVA);
+//            jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
         }else{
             mRankData = databaseHelper.selectBasicJavaStepList();
         }
-
 
         RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
@@ -131,21 +151,22 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+//        makeTestData();
+
         //메인 자바버튼 클릭한 경우
         mainJavaStepBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //자바버튼 중복 눌렀을 때 예외처리
+                //3초이내에 다시 눌리면 이벤트를 불러올수있다
                 if (currentNum == 0) {
                     return;
                 }
                 currentNum = 0;
 
-                RankRecyclerview.scrollToPosition(0);//스크롤 위치 맨위로 이동시켜준다
-                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());//selectBasicJavaStepList 값 연결
-                RankRecyclerviewAdapter.notifyDataSetChanged();//리스트 항목 갱신
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
 
 
                 switch (view.getId()) {
@@ -167,13 +188,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //안드로이드버튼 중복 눌렀을 때 예외처리
+
                 if (currentNum == 1) {
                     return;
                 }
 
                 currentNum = 1;
-
 
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
@@ -184,29 +204,34 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
-                        public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isAndroidComplete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_ANDROID,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 1){
+                                    if(isAndroidComplete && javaCrawlUrlLength == 0 && currentNum == 1){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_ANDROID, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                            if(!isAndroidComplete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_ANDROID);
                 }
 
-                RankRecyclerview.scrollToPosition(0);//스크롤 위치 맨위로 이동시켜준다
-                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList()); //selectBasicAndroidStepList 값 연결
-                RankRecyclerviewAdapter.notifyDataSetChanged(); //리스트 항목 갱신
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
 
                 switch (view.getId()) {
                     //안드로이드버튼만 selected(선택)되어서 안드로이드버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
@@ -236,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
 
                 currentNum = 2;
 
-
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
                 if("".equals(lastUpdate)){
@@ -246,35 +270,42 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
-                        public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isPHPComplete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_PHP,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 2){
+                                    if(isPHPComplete && javaCrawlUrlLength == 0 && currentNum == Constant.RANK_TYPE_BASIC_PHP){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_PHP, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                            if(!isPHPComplete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_PHP);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_PHP);
                 }
 
-                RankRecyclerview.scrollToPosition(0);//스크롤 위치 맨위로 이동시켜준다
-                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());//selectBasicPhpStepList 값 연결
-                RankRecyclerviewAdapter.notifyDataSetChanged();//리스트 항목 갱신
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //PHP버튼만 selected(선택)되어서 PHP버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_php_step_btn:
                         mainJavaStepBtn.setSelected(false);
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(true);
+//                        mainPhpStepBtn.setClickable(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
@@ -294,7 +325,6 @@ public class MainActivity extends AppCompatActivity {
 
                 currentNum =3;
 
-
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
                 if("".equals(lastUpdate)){
@@ -304,29 +334,35 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
-                        public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isHard1Complete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_HARD_1,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 3){
+                                    if(isHard1Complete && javaCrawlUrlLength == 0 && currentNum == 3){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_1, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                            if(!isHard1Complete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_1);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_1);
                 }
 
-                RankRecyclerview.scrollToPosition(0);//스크롤 위치 맨위로 이동시켜준다
-                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());//selectHardStep1List 값 연결
-                RankRecyclerviewAdapter.notifyDataSetChanged();//리스트 항목 갱신
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //응용1단계버튼만 selected(선택)되어서 응용1단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard1_step_btn:
@@ -334,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(true);
+//                        mainHard1StepBtn.setClickable(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
                 }
@@ -354,7 +391,6 @@ public class MainActivity extends AppCompatActivity {
 
                 currentNum = 4;
 
-
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
                 if("".equals(lastUpdate)){
@@ -365,28 +401,35 @@ public class MainActivity extends AppCompatActivity {
                     jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
                         @Override
                         public void onProgressUpdate(final Integer integer, Document document) {
-                            javaCrawlUrlLength ++;
-                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,currentNum,databaseHelper);
+                            if(integer == -1){
+                                isHard2Complete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_HARD_2,databaseHelper);
                             jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
                                 @Override
                                 public void onPostExecute() {
                                     javaCrawlUrlLength--;
-                                    if(integer == -1 && javaCrawlUrlLength == 0 && currentNum == 4){
+                                    if(isHard2Complete && javaCrawlUrlLength == 0 && currentNum == 4){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_2, true);
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
                                 }
                             });
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                            if(!isHard2Complete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_2);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_2);
                 }
 
-                RankRecyclerview.scrollToPosition(0);//스크롤 위치 맨위로 이동시켜준다
-                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());//selectHardStep2List 값 연결
-                RankRecyclerviewAdapter.notifyDataSetChanged();//리스트 항목 갱신
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //응용2단계버튼만 selected(선택)되어서 응용2단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard2_step_btn:
@@ -395,6 +438,7 @@ public class MainActivity extends AppCompatActivity {
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(true);
+//                        mainHard2StepBtn.setClickable(false);
                         break;
                 }
 
@@ -408,12 +452,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    //리사이클러뷰 안에 목록 아이템을 선택했을 때 이벤트처리
+
     RankRecyclerviewAdapter.OnclickItemListener onClickItemListener = new RankRecyclerviewAdapter.OnclickItemListener() {
         @Override
         public void clickDetaiInfo(RankData rankData) {
-
-//            Log.v("메인액티비티", "ID = " + rankData.getRankID());
+//            Intent intent = new Intent(MainActivity.this,RankDescriptionActivity.class);
+//            intent.putExtra("rankData",rankData);
+//            startActivity(intent);
+            Log.v("메인액티비티", "ID = " + rankData.getRankID());
 
             showAlertDialog(rankData);
 
@@ -422,19 +468,27 @@ public class MainActivity extends AppCompatActivity {
 
     //리사이클러뷰 목록에 있는 작품 아이템을 선택하면 자세하게 보여주는 다이어로그
     private void showAlertDialog(RankData rankData) {
-/*        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-        View layoutView = getLayoutInflater().inflate(R.layout.activity_rank_description, null);
-        Button dialogButton = layoutView.findViewById(R.id.btnDialog); //다이어로그 btnDialog레이아웃보여준다
-        dialogBuilder.setView(layoutView);
-        alertDialog = dialogBuilder.create(); //다이어로그 생성*/
-
-        alertDialog = new RankDescriptionActivity(MainActivity.this);//메인액티비티에 다이어로그 생성
-        alertDialog.setRankData(rankData);//다이어로그 rankData 가져오기
+//        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+//        View layoutView = getLayoutInflater().inflate(R.layout.activity_rank_description, null);
+//        Button dialogButton = layoutView.findViewById(R.id.btnDialog); //다이어로그 btnDialog레이아웃보여준다
+//        dialogBuilder.setView(layoutView);
+//        alertDialog = dialogBuilder.create(); //다이어로그 생성
+        //생성될때 선언하는 위치
+        alertDialog = new RankDescriptionActivity(MainActivity.this);
+        alertDialog.setRankData(rankData);
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
-        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));//다이어로그배경
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+//        rankLike.setText(rankData.getLikeCount()+" ");
 
-        alertDialog.show();//다이어로그 보여주기
+        alertDialog.show();
+        //확인 버튼 클릭시 다이어로그 사라짐
+//        dialogButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                alertDialog.dismiss();
+//            }
+//        });
     }
 
     //메인 툴바에 사용하기위한 옵션메뉴를 생성합니다
@@ -521,17 +575,4 @@ public class MainActivity extends AppCompatActivity {
         builder.show();//다이어로그 보여주기
     }
 
-
-/*    //테스트하기위해서 만든 메소드입니다
-    public void makeTestData() {
-
-        mRankData = new ArrayList<>();
-
-        mRankData = databaseHelper.selectBasicAndroidStepList();
-      mRankData.add(new RankData(rankID,rankTitle,rankWriter,createDate,detailLink,thumbPath,
-      viewCount,likeCount,replyCount,rankType,ranking,rankPoint));
-
-    }
-
-    }*/
 }

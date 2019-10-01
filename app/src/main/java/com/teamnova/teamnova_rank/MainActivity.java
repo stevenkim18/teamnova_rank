@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     /* sqlDB */
     private DatabaseHelper databaseHelper;
 
+    RankRecyclerviewAdapter RankRecyclerviewAdapter;
+
     private long lastClickTime = 0; //lastClickTime:마지막으로 작품카테고리(자바,안드로이드,php,응용1,응용2)를 선택한 시간
 
     private int currentNum = 0;
@@ -72,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
         mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
-        rankName = findViewById(R.id.rank_name);
+/*        rankName = findViewById(R.id.rank_name);
         rankLike = findViewById(R.id.rank_like);
         rankReply = findViewById(R.id.rank_reply);
-        rankView = findViewById(R.id.rank_view);
+        rankView = findViewById(R.id.rank_view);*/
 
         mainToolbar = findViewById(R.id.main_toolbar);
 
@@ -90,9 +93,8 @@ public class MainActivity extends AppCompatActivity {
         RankRecyclerview.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
 
 
-        RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+        RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
 
-        final RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter();//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
@@ -262,7 +264,10 @@ public class MainActivity extends AppCompatActivity {
 //            Intent intent = new Intent(MainActivity.this,RankDescriptionActivity.class);
 //            intent.putExtra("rankData",rankData);
 //            startActivity(intent);
+            Log.v("메인액티비티", "ID = " + rankData.getRankID());
+
             showAlertDialog(rankData);
+
         }
     };
 
@@ -278,6 +283,8 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.setRankData(rankData);
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+//        rankLike.setText(rankData.getLikeCount()+" ");
 
         alertDialog.show();
         //확인 버튼 클릭시 다이어로그 사라짐

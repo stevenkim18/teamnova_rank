@@ -548,7 +548,7 @@ public class MainActivity extends BaseActivity {
 
                 return true;
 
-            //목록버튼을 클릭한경우
+             //목록버튼을 클릭한경우
             case R.id.action_refresh:
                 //listDialog();
                 for(int updateCrawlUrlNum : Constant.CAFE_TEAMNOVA_NUMBER_LIST){

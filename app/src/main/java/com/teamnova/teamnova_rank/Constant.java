@@ -39,7 +39,7 @@ public class Constant {
     // 응용 2단계 작품
     public static final String CAFE_TEAMNOVA_HARD2_URL = "https://cafe.naver.com/ArticleList.nhn?search.clubid=29412673&search.menuid=24&search.boardtype=C&search.totalCount=31&search.page=";
 
-    // 팀노바 카페 목록 리스트
+    //  팀노바 카페 목록 리스트
     public static final List<String> CAFE_TEAMNOVA_URL_LIST = new ArrayList<String>(){{
         add(CAFE_TEAMNOVA_JAVA_URL);
         add(CAFE_TEAMNOVA_ANDROID_URL);

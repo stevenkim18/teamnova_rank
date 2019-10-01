@@ -58,6 +58,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private boolean isNetworkConnected(Context context){
+
         ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         // 모바일 네트워크

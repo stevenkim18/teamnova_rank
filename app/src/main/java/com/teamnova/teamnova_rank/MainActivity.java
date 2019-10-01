@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -25,14 +24,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -55,26 +48,23 @@ public class MainActivity extends AppCompatActivity {
 
     private List<RankData> mRankData;
 
-//    private RankDescriptionActivity alertDialog ;
+    private RankDescriptionActivity alertDialog ;
 //    AlertDialog alertDialog;
 
     /* sqlDB */
     private DatabaseHelper databaseHelper;
 
+    RankRecyclerviewAdapter RankRecyclerviewAdapter;
+
     private long lastClickTime = 0; //lastClickTime:마지막으로 작품카테고리(자바,안드로이드,php,응용1,응용2)를 선택한 시간
 
     private int currentNum = 0;
-
-    // 크롤링 할 URL 주소를 담는 리스트
-    private ArrayList<String> urls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
 
         /* sqldbHelper */
         databaseHelper = DatabaseHelper.getInstance(this);
@@ -85,13 +75,12 @@ public class MainActivity extends AppCompatActivity {
         mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
-        rankName = findViewById(R.id.rank_name);
+/*        rankName = findViewById(R.id.rank_name);
         rankLike = findViewById(R.id.rank_like);
         rankReply = findViewById(R.id.rank_reply);
-//        rankView = findViewById(R.id.rank_view);
+        rankView = findViewById(R.id.rank_view);*/
 
         mainToolbar = findViewById(R.id.main_toolbar);
-        mainToolbar.setTitle(""); //메인 툴바에 나오는 앱 제목을 지우기 위해 공백으로 표현
 
         mainJavaStepBtn.setSelected(true);
         RankRecyclerview = findViewById(R.id.rank_recyclerview);
@@ -101,10 +90,11 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);//종류는 총 3가지, ListView를 사용하기 위한 사용
         RankRecyclerview.setHasFixedSize(true);//각 아이템이 보여지는 것을 일정하게
         RankRecyclerview.setLayoutManager(llm);//앞서 선언한 리싸이클러뷰를 레이아웃메니저에 붙힌다
-//        RankRecyclerview.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
+        RankRecyclerview.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
 
 
-        final RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter();//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+        RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+
         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
@@ -120,28 +110,12 @@ public class MainActivity extends AppCompatActivity {
                 if (currentNum == 0) {
                     return;
                 }
+
                 currentNum = 0;
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
 
-                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_BASIC_JAVA);
-                if("".equals(lastUpdate)){
-                    // 가져올 데이터가 없다면 크롤링 시작
-                    JsoupAsyncCrawler jsoupAsyncCrawler = new JsoupAsyncCrawler();
-                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
-                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupAsyncCrawler.JsoupAsyncListener() {
-                        @Override
-                        public void onPostExecute(Integer integer) {
-                            if(currentNum == Constant.RANK_TYPE_BASIC_JAVA){
-                                RankRecyclerview.smoothScrollToPosition(0);
-                                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
-                                RankRecyclerviewAdapter.notifyDataSetChanged();
-                            }
-
-                        }
-                    });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
-                }else{
-                    Log.d("로딩중",",,,,");
-                }
 
                 switch (view.getId()) {
                     //자바버튼만 selected(선택)되어서 자바버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
@@ -168,26 +142,10 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 1;
-                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_BASIC_ANDROID);
-                if("".equals(lastUpdate)){
-                    // 가져올 데이터가 없다면 크롤링 시작
-                    JsoupAsyncCrawler jsoupAsyncCrawler = new JsoupAsyncCrawler();
-                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
-                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupAsyncCrawler.JsoupAsyncListener() {
-                        @Override
-                        public void onPostExecute(Integer integer) {
 
-                            RankRecyclerview.smoothScrollToPosition(0);
-                            RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
-                            RankRecyclerviewAdapter.notifyDataSetChanged();
-
-                        }
-                    });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_ANDROID);
-                }else{
-                    Log.d("로딩중",",,,,");
-                }
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
 
                 switch (view.getId()) {
                     //안드로이드버튼만 selected(선택)되어서 안드로이드버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
@@ -216,26 +174,9 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 2;
-                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_BASIC_PHP);
-                if("".equals(lastUpdate)){
-                    // 가져올 데이터가 없다면 크롤링 시작
-                    JsoupAsyncCrawler jsoupAsyncCrawler = new JsoupAsyncCrawler();
-                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
-                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupAsyncCrawler.JsoupAsyncListener() {
-                        @Override
-                        public void onPostExecute(Integer integer) {
-
-                            RankRecyclerview.smoothScrollToPosition(0);
-                            RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
-                            RankRecyclerviewAdapter.notifyDataSetChanged();
-
-                        }
-                    });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_PHP);
-                }else{
-                    Log.d("로딩중",",,,,");
-                }
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //PHP버튼만 selected(선택)되어서 PHP버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_php_step_btn:
@@ -259,29 +200,11 @@ public class MainActivity extends AppCompatActivity {
                 if (currentNum == 3) {
                     return;
                 }
+
                 currentNum =3;
-
-                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_HARD_1);
-                if("".equals(lastUpdate)){
-                    // 가져올 데이터가 없다면 크롤링 시작
-                    JsoupAsyncCrawler jsoupAsyncCrawler = new JsoupAsyncCrawler();
-                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
-                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupAsyncCrawler.JsoupAsyncListener() {
-                        @Override
-                        public void onPostExecute(Integer integer) {
-
-                            RankRecyclerview.smoothScrollToPosition(0);
-                            RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
-                            RankRecyclerviewAdapter.notifyDataSetChanged();
-
-                        }
-                    });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_1);
-                }else{
-                    Log.d("로딩중",",,,,");
-                }
-
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //응용1단계버튼만 selected(선택)되어서 응용1단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard1_step_btn:
@@ -309,27 +232,9 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 4;
-
-                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_HARD_2);
-                if("".equals(lastUpdate)){
-                    // 가져올 데이터가 없다면 크롤링 시작
-                    JsoupAsyncCrawler jsoupAsyncCrawler = new JsoupAsyncCrawler();
-                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
-                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupAsyncCrawler.JsoupAsyncListener() {
-                        @Override
-                        public void onPostExecute(Integer integer) {
-
-                            RankRecyclerview.smoothScrollToPosition(0);
-                            RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
-                            RankRecyclerviewAdapter.notifyDataSetChanged();
-
-                        }
-                    });
-                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_2);
-                }else{
-                    Log.d("로딩중",",,,,");
-                }
-
+                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
+                RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
                     //응용2단계버튼만 selected(선택)되어서 응용2단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard2_step_btn:
@@ -359,7 +264,10 @@ public class MainActivity extends AppCompatActivity {
 //            Intent intent = new Intent(MainActivity.this,RankDescriptionActivity.class);
 //            intent.putExtra("rankData",rankData);
 //            startActivity(intent);
+            Log.v("메인액티비티", "ID = " + rankData.getRankID());
+
             showAlertDialog(rankData);
+
         }
     };
 
@@ -371,12 +279,14 @@ public class MainActivity extends AppCompatActivity {
 //        dialogBuilder.setView(layoutView);
 //        alertDialog = dialogBuilder.create(); //다이어로그 생성
         //생성될때 선언하는 위치
-//        alertDialog = new RankDescriptionActivity(MainActivity.this);
-//        alertDialog.setRankData(rankData);
-//        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
-//        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//
-//        alertDialog.show();
+        alertDialog = new RankDescriptionActivity(MainActivity.this);
+        alertDialog.setRankData(rankData);
+        alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+//        rankLike.setText(rankData.getLikeCount()+" ");
+
+        alertDialog.show();
         //확인 버튼 클릭시 다이어로그 사라짐
 //        dialogButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -488,7 +398,24 @@ public class MainActivity extends AppCompatActivity {
 //        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 0));
 //        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 0));
 
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 1000));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 900));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,3, 800));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,4, 700));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 600));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 500));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,7, 400));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,8, 300));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,9, 200));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,10, 999));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,11, 10));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,12, 78));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,13, 1));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,14, 45));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,15, 9));
+        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,16, 9999));
+
+    }
 
     }*/
-
 }

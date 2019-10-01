@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     if(!isJavaComplete)
-                    jsoupPageCrawler.executeOnExecutor(executor);
+                        jsoupPageCrawler.executeOnExecutor(executor);
                 }
             });
             jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_JAVA);
@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             if(!isAndroidComplete)
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
                     jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_ANDROID);
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             if(!isPHPComplete)
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
                     jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_PHP);
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             if(!isHard1Complete)
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
                     jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_1);
@@ -422,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
                             });
                             if(!isHard2Complete)
-                            jsoupPageCrawler.executeOnExecutor(executor);
+                                jsoupPageCrawler.executeOnExecutor(executor);
                         }
                     });
                     jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_2);

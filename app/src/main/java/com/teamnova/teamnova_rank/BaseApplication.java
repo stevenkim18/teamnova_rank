@@ -118,7 +118,7 @@ public class BaseApplication extends Application {
             progressDialog.setContentView(R.layout.dialog_loading);
             progressDialog.show();
 
-        }
+         }
 
 
         LottieAnimationView rankLoadingAv = progressDialog.findViewById(R.id.rank_loading_av);

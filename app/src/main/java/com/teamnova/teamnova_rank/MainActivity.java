@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
 
     //mainJavaStepBtn:mainJavaStepBtn을 클릭하면 자바 작품들이 RankRecyclerview에 보인다.
@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         /* 데이터를 저장한 기록이 있는지 확인한다. */
         String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_BASIC_JAVA);
         if("".equals(lastUpdate)){
+            progressOn();
 
             // 가져올 데이터가 없다면 크롤링 시작
             JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
@@ -133,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
                                 databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA, true);
                                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                                 RankRecyclerviewAdapter.notifyDataSetChanged();
+                                progressOFF();
                             }
                         }
                     });
@@ -201,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
                 if("".equals(lastUpdate)){
-
+                    progressOn();
                     // 가져올 데이터가 없다면 크롤링 시작
                     JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
@@ -223,6 +225,7 @@ public class MainActivity extends AppCompatActivity {
                                         RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
+                                        progressOFF();
                                     }
                                 }
                             });
@@ -268,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
                 if("".equals(lastUpdate)){
-
+                    progressOn();
                     // 가져올 데이터가 없다면 크롤링 시작
                     JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
@@ -290,6 +293,7 @@ public class MainActivity extends AppCompatActivity {
                                         RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
+                                        progressOFF();
                                     }
                                 }
                             });
@@ -333,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
                 if("".equals(lastUpdate)){
-
+                    progressOn();
                     // 가져올 데이터가 없다면 크롤링 시작
                     JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
@@ -355,6 +359,7 @@ public class MainActivity extends AppCompatActivity {
                                         RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
+                                        progressOFF();
                                     }
                                 }
                             });
@@ -400,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
                 /* 데이터를 저장한 기록이 있는지 확인한다. */
                 String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
                 if("".equals(lastUpdate)){
-
+                    progressOn();
                     // 가져올 데이터가 없다면 크롤링 시작
                     JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
                     jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
@@ -423,6 +428,7 @@ public class MainActivity extends AppCompatActivity {
                                         RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
+                                        progressOFF();
                                     }
                                 }
                             });

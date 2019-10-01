@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 65467;
+    private static final int DATABASE_VERSION = 65473;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -130,14 +130,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     public String selectLastCourseTypeUpdateDate(int COURSE_TYPE){
         String query = "";
         query = "SELECT " +
-                    CRAWL_SCHEME_CRAWL_DATE +
+                CRAWL_SCHEME_CRAWL_DATE +
                 " FROM " +
-                    TABLE_NAME_CRAWL_SCHEME +
+                TABLE_NAME_CRAWL_SCHEME +
                 " WHERE " +
-                    CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
-                    " AND " + CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = " + COURSE_TYPE +
+                CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
+                " AND " + CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = " + COURSE_TYPE +
                 " ORDER BY " +
-                    CRAWL_SCHEME_CRAWL_ID + " DESC LIMIT 1";
+                CRAWL_SCHEME_CRAWL_ID + " DESC LIMIT 1";
         Log.d(TAG, "selectLastCourseTypeUpdateDate 쿼리 : "+query);
         Cursor cursor = database.rawQuery(query,null);
         String result = "";
@@ -155,13 +155,13 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     public String selectLastUpdateDate(){
         String query = "";
         query = "SELECT " +
-                        CRAWL_SCHEME_CRAWL_DATE +
+                CRAWL_SCHEME_CRAWL_DATE +
                 " FROM " +
-                        TABLE_NAME_CRAWL_SCHEME +
+                TABLE_NAME_CRAWL_SCHEME +
                 " GROUP BY " +
-                        CRAWL_SCHEME_CRAWL_DATE +
+                CRAWL_SCHEME_CRAWL_DATE +
                 " HAVING " +
-                        "COUNT("+CRAWL_SCHEME_CRAWL_DATE+") == 5";
+                "COUNT("+CRAWL_SCHEME_CRAWL_DATE+") == 5";
         Log.d(TAG, "selectLastUpdateDate 쿼리 : "+query);
         Cursor cursor = database.rawQuery(query,null);
         String result = "";
@@ -179,17 +179,17 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     public boolean isCompleteCrawling(){
         String query = "";
         query = "SELECT "  +
-                        "CASE WHEN COUNT(*) = 5 THEN 1 ELSE 0 END AS RESULT" +
+                "CASE WHEN COUNT(*) = 5 THEN 1 ELSE 0 END AS RESULT" +
                 " FROM " +
-                        "(SELECT " +
-                                    CRAWL_SCHEME_CRAWL_COURSE_TYPE +
-                        " FROM " +
-                                TABLE_NAME_CRAWL_SCHEME+
-                        " WHERE " +
-                                CRAWL_SCHEME_CRAWL_DATE +" = strftime('%Y-%m-%d','now', 'localtime')" +
-                                " AND " + CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
-                        " GROUP BY " +
-                                CRAWL_SCHEME_CRAWL_COURSE_TYPE +")";
+                "(SELECT " +
+                CRAWL_SCHEME_CRAWL_COURSE_TYPE +
+                " FROM " +
+                TABLE_NAME_CRAWL_SCHEME+
+                " WHERE " +
+                CRAWL_SCHEME_CRAWL_DATE +" = strftime('%Y-%m-%d','now', 'localtime')" +
+                " AND " + CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
+                " GROUP BY " +
+                CRAWL_SCHEME_CRAWL_COURSE_TYPE +")";
 
 
         Cursor cursor = database.rawQuery(query,null);
@@ -208,12 +208,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
     public void updateCrawlScheme(List<Integer> updateList, boolean isSuccess){
 
         String query = "UPDATE " +
-                                TABLE_NAME_CRAWL_SCHEME +
-                        " SET " +
-                                CRAWL_SCHEME_CRAWL_SUCCESS + " = " + (isSuccess ? 1 : 0) +
-                        " WHERE " +
-                                 CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
-                                " AND " + CRAWL_SCHEME_CRAWL_COURSE_TYPE + " IN ("+ TextUtils.join(",",updateList) +") ";
+                TABLE_NAME_CRAWL_SCHEME +
+                " SET " +
+                CRAWL_SCHEME_CRAWL_SUCCESS + " = " + (isSuccess ? 1 : 0) +
+                " WHERE " +
+                CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
+                " AND " + CRAWL_SCHEME_CRAWL_COURSE_TYPE + " IN ("+ TextUtils.join(",",updateList) +") ";
         database.execSQL(query);
 //        String whereQuery = CRAWL_SCHEME_CRAWL_DATE + " = ? AND "+CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = ?";
 
@@ -243,13 +243,13 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
      */
     public boolean selectCrawlScheme(final int COURSE_TYPE){
         String query = "SELECT "+
-                                "COUNT(*) " +
-                        " FROM "+
-                                TABLE_NAME_CRAWL_SCHEME +
-                        " WHERE " +
-                                CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
-                                "AND "+ CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
-                                "AND "+ CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = "+ COURSE_TYPE;
+                "COUNT(*) " +
+                " FROM "+
+                TABLE_NAME_CRAWL_SCHEME +
+                " WHERE " +
+                CRAWL_SCHEME_CRAWL_DATE + " = strftime('%Y-%m-%d','now', 'localtime')" +
+                "AND "+ CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
+                "AND "+ CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = "+ COURSE_TYPE;
 
         Cursor cursor = database.rawQuery(query,null);
         cursor.moveToFirst();
@@ -327,24 +327,24 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         List<RankData> resultList = new ArrayList<>();
         String query = "";
         query = "SELECT " +
-                        RANK_WRITER +
-                        ", (SELECT "+
-                                RANK_THUMB_PATH+
-                            " FROM "+
-                                TABLE_NAME_RANK+" T "+
-                            "WHERE "+
-                                "T."+RANK_WRITER+" = RIT."+RANK_WRITER+
-                            " GROUP BY "+
-                                RANK_WRITER+
-                            " HAVING MAX("+RANK_RANK_POINT+")) AS "+RANK_THUMB_PATH +
-                        ", SUM("+RANK_RANK_POINT+")/COUNT("+RANK_WRITER+") AS "+RANK_RANK_POINT+
-                        ",COUNT("+RANK_RANK_ID+") AS WORK_COUNT"+
-                " FROM " +
-                        TABLE_NAME_RANK+" RIT" +
+                RANK_WRITER +
+                ", (SELECT "+
+                RANK_THUMB_PATH+
+                " FROM "+
+                TABLE_NAME_RANK+" T "+
+                "WHERE "+
+                "T."+RANK_WRITER+" = RIT."+RANK_WRITER+
                 " GROUP BY "+
-                        RANK_WRITER+
+                RANK_WRITER+
+                " HAVING MAX("+RANK_RANK_POINT+")) AS "+RANK_THUMB_PATH +
+                ", SUM("+RANK_RANK_POINT+")/COUNT("+RANK_WRITER+") AS "+RANK_RANK_POINT+
+                ",COUNT("+RANK_RANK_ID+") AS WORK_COUNT"+
+                " FROM " +
+                TABLE_NAME_RANK+" RIT" +
+                " GROUP BY "+
+                RANK_WRITER+
                 " ORDER BY "+
-                        "SUM("+RANK_RANK_POINT+")/COUNT("+RANK_WRITER+") DESC";
+                "SUM("+RANK_RANK_POINT+")/COUNT("+RANK_WRITER+") DESC";
 
 
         Log.d(TAG, "selectIndividualRankList 쿼리 : "+query);
@@ -433,24 +433,24 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 //                                "ROW_NUMBER() OVER(ORDER BY VIEW_COUNT + (5 * LIKE_COUNT) ASC) AS RANKING ,"+
 //                                "'1' AS RANKING , " +
 //                                "(SELECT COUNT(*) FROM "+TABLE_NAME_RANK+" TEMP WHERE RANK.RANK_ID) AS RANKING ," +
-                                "1 AS RANKING ," +
-                                "TITLE ,"+
-                                "WRITER ,"+
-                                "CREATE_DATE ,"+
-                                "DETAIL_LINK ,"+
-                                "THUMB_PATH ,"+
-                                "VIEW_COUNT ,"+
-                                "LIKE_COUNT ,"+
-                                "REPLY_COUNT ,"+
-                                "TYPE ,"+
-                                "RANK_ID ,"+
-                                "RANK_POINT "+
-                        " FROM " +
-                                TABLE_NAME_RANK +" RANK " +
-                        " WHERE " +
-                                "TYPE = '"+TYPE_STEP +"'" +
-                        " ORDER BY " +
-                                "VIEW_COUNT + (5 * LIKE_COUNT) DESC";
+                "1 AS RANKING ," +
+                "TITLE ,"+
+                "WRITER ,"+
+                "CREATE_DATE ,"+
+                "DETAIL_LINK ,"+
+                "THUMB_PATH ,"+
+                "VIEW_COUNT ,"+
+                "LIKE_COUNT ,"+
+                "REPLY_COUNT ,"+
+                "TYPE ,"+
+                "RANK_ID ,"+
+                "RANK_POINT "+
+                " FROM " +
+                TABLE_NAME_RANK +" RANK " +
+                " WHERE " +
+                "TYPE = '"+TYPE_STEP +"'" +
+                " ORDER BY " +
+                "VIEW_COUNT + (5 * LIKE_COUNT) DESC";
 
         Log.d(TAG, "쿼리 : "+query);
 

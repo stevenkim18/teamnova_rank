@@ -66,6 +66,8 @@ public class MainActivity extends BaseActivity {
 
     RankRecyclerviewAdapter RankRecyclerviewAdapter;
 
+    SearchView searchView;
+
     private long lastClickTime = 0; //lastClickTime:마지막으로 작품카테고리(자바,안드로이드,php,응용1,응용2)를 선택한 시간
 
     private int currentNum = 0;
@@ -135,6 +137,7 @@ public class MainActivity extends BaseActivity {
                             if(isJavaComplete && javaCrawlUrlLength == 0 && currentNum == 0){
                                 // 크롤링 성공 저장
                                 databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA, true);
+                                RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicJavaStepList());
                                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                                 RankRecyclerviewAdapter.notifyDataSetChanged();
                                 progressOFF();
@@ -176,6 +179,8 @@ public class MainActivity extends BaseActivity {
                 RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
+
+                searchView.onActionViewCollapsed();
 
 
                 switch (view.getId()) {
@@ -226,7 +231,7 @@ public class MainActivity extends BaseActivity {
                                     javaCrawlUrlLength--;
                                     if(isAndroidComplete && javaCrawlUrlLength == 0 && currentNum == 1){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_ANDROID, true);
-                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicAndroidStepList());
+                                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                         progressOFF();
@@ -241,8 +246,10 @@ public class MainActivity extends BaseActivity {
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicAndroidStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
+                searchView.onActionViewCollapsed();             // 서치뷰 닫음
 
                 switch (view.getId()) {
                     //안드로이드버튼만 selected(선택)되어서 안드로이드버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
@@ -294,7 +301,7 @@ public class MainActivity extends BaseActivity {
                                     javaCrawlUrlLength--;
                                     if(isPHPComplete && javaCrawlUrlLength == 0 && currentNum == Constant.RANK_TYPE_BASIC_PHP){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_PHP, true);
-                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicPhpStepList());
+                                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                         progressOFF();
@@ -310,8 +317,12 @@ public class MainActivity extends BaseActivity {
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicPhpStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
+
+                searchView.onActionViewCollapsed();             // 서치뷰 닫음
+
                 switch (view.getId()) {
                     //PHP버튼만 selected(선택)되어서 PHP버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_php_step_btn:
@@ -360,7 +371,7 @@ public class MainActivity extends BaseActivity {
                                     javaCrawlUrlLength--;
                                     if(isHard1Complete && javaCrawlUrlLength == 0 && currentNum == 3){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_1, true);
-                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectHardStep1List());
+                                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                         progressOFF();
@@ -376,8 +387,12 @@ public class MainActivity extends BaseActivity {
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep1List());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
+
+                searchView.onActionViewCollapsed();             // 서치뷰 닫음
+
                 switch (view.getId()) {
                     //응용1단계버튼만 selected(선택)되어서 응용1단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard1_step_btn:
@@ -429,7 +444,7 @@ public class MainActivity extends BaseActivity {
                                     javaCrawlUrlLength--;
                                     if(isHard2Complete && javaCrawlUrlLength == 0 && currentNum == 4){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_2, true);
-                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectHardStep2List());
+                                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                         progressOFF();
@@ -445,8 +460,12 @@ public class MainActivity extends BaseActivity {
                 }
 
                 RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep2List());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
+
+                searchView.onActionViewCollapsed();             // 서치뷰 닫음
+
                 switch (view.getId()) {
                     //응용2단계버튼만 selected(선택)되어서 응용2단계버튼에만 색깔이 변경됩니다 다른 버튼들은 default(기본)색상입니다
                     case R.id.main_hard2_step_btn:
@@ -514,7 +533,7 @@ public class MainActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
         // searchView 생성
-        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
         // 검색 버튼을 눌렀을 때 뷰가 꽉차게 해주기
         searchView.setMaxWidth(Integer.MAX_VALUE);
 

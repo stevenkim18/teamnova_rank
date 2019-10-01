@@ -47,4 +47,13 @@ public class Constant {
         add(CAFE_TEAMNOVA_HARD1_URL);
         add(CAFE_TEAMNOVA_HARD2_URL);
     }};
+
+    // 팀노바 카페 목록 번호 리스트
+    public static final List<Integer> CAFE_TEAMNOVA_NUMBER_LIST = new ArrayList<Integer>(){{
+        add(RANK_TYPE_BASIC_JAVA);
+        add(RANK_TYPE_BASIC_ANDROID);
+        add(RANK_TYPE_BASIC_PHP);
+        add(RANK_TYPE_HARD_1);
+        add(RANK_TYPE_HARD_2);
+    }};
 }

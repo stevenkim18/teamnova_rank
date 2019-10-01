@@ -312,6 +312,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         contentValues.put(RANK_TYPE           ,rankType);
         contentValues.put(RANK_RANK_POINT     ,viewCount + (likeCount * 5));
 
+        Log.d(TAG,"등록 제목 :"+rankTitle);
         //데이터 목록 등록
         database.insert(TABLE_NAME_RANK, null, contentValues);
 

@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     /* sqlDB */
     private DatabaseHelper databaseHelper;
 
+    RankRecyclerviewAdapter RankRecyclerviewAdapter;
+
     private long lastClickTime = 0; //lastClickTime:마지막으로 작품카테고리(자바,안드로이드,php,응용1,응용2)를 선택한 시간
 
     private int currentNum = 0;
@@ -91,9 +93,8 @@ public class MainActivity extends AppCompatActivity {
         RankRecyclerview.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
 
 
-        RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+        RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
 
-        final RankRecyclerviewAdapter RankRecyclerviewAdapter = new RankRecyclerviewAdapter();//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);

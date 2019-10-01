@@ -42,4 +42,9 @@ public interface RankDataInterface {
 
     // 개인별 평균 점수 목록
     List<RankData> selectIndividualRankList();
+
+    // 팀원 이름 또는 작품명으로 검색
+    List<RankData> selectRankListBySearchText();
+
+
 }

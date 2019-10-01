@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.initialization.AdapterStatus;
 import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdCallback;
@@ -592,7 +593,6 @@ public class AdmobActivity extends AppCompatActivity {
         urls.add(Constant.CAFE_TEAMNOVA_PHP_URL);    //PHP
         urls.add(Constant.CAFE_TEAMNOVA_HARD1_URL);    //응용1단계
         urls.add(Constant.CAFE_TEAMNOVA_HARD2_URL);    //응용2단계
-
     }
 
     @Override

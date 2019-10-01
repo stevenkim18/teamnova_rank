@@ -84,6 +84,7 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
         public MyViewholder(View itemview){
 
             super(itemview);
+          
             rankNormalCl = itemview.findViewById(R.id.rank_item_cl);  //랭크목록에 있는 아이템 컨스트레인트레이아웃
             goldLottieAnimation = itemview.findViewById(R.id.gold_lottie_animation);//goldLottieAnimation:금색트로피 모양의 로띠
             silverLottieAnimation = itemview.findViewById(R.id.silver_lottie_animation);//silverLottieAnimation:은색트로피 모양의 로띠
@@ -173,8 +174,10 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
         holder.rankTitle.setText(data.getRankWriter()); //제목 보여주기
         holder.rankPoint.setText(data.getRankingPoint()+"");//점수 보여주기
 
-        //썸네일 url을 이미지로 가져온다
-        Glide.with(context).load(data.getThumbPath()).into(holder.rankImage);
+
+       Glide.with(context)
+               .load(data.getThumbPath())
+/              .into(holder.rankImage);
 
 
         if(position == 0){
@@ -196,7 +199,7 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
     private void showTooltip(View view, Boolean isToolTipshowed){
 
         // 처음에 툴팁을 한번만 보여주기 위해서 사용.
-        this.isToolTipshowed = false;
+        isToolTipshowed = false;
 
         if(isToolTipshowed){
             new SimpleTooltip.Builder(context)

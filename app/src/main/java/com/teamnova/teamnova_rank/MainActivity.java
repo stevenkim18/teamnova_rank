@@ -639,7 +639,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private class JsoupAsyncTask extends AsyncTask<Integer, Void, Void>{
+
         int ASYNC_URL_NUM;
+
         // AsyncTask 실행 전
         @Override
         protected void onPreExecute() {
@@ -651,13 +653,16 @@ public class MainActivity extends BaseActivity {
         @Override
         protected Void doInBackground(Integer... voids) {
             int url_num = voids[0];
+
             ASYNC_URL_NUM = url_num;
+
             try {
 
 //                for(int url_num = 0; url_num < Constant.CAFE_TEAMNOVA_URL_LIST.size(); url_num++){
                     databaseHelper.deleteRankData(url_num);
 
                     databaseHelper.insertCrawlScheme(url_num, true);
+
                     int page_num = 0;
 
                     while (true){

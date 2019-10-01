@@ -28,12 +28,17 @@ public class CrawlingBroadActivity extends AppCompatActivity {
     // 크롤링 시작 버튼
     Button start_crawling_btn;
 
+    DatabaseHelper databaseHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crawling_broad);
 
         start_crawling_btn = findViewById(R.id.start_crawling_btn);
+
+        //DBHelper 초기화
+        databaseHelper = DatabaseHelper.getInstance(this);
 
         // url 주소 리스트 만들기
         makeUrlList();
@@ -70,7 +75,7 @@ public class CrawlingBroadActivity extends AppCompatActivity {
             try {
 
                 for(int url_num = 0; url_num < urls.size(); url_num++){
-
+                    databaseHelper.deleteRankData(url_num);
                     Log.v(TAG, "==============================================================================================");
 
                     int page_num = 0;
@@ -95,7 +100,7 @@ public class CrawlingBroadActivity extends AppCompatActivity {
                         }
 
                         // 크롤링 시작
-                        getDataFromWebPage(document);
+                        getDataFromWebPage(document, url_num);
 
                     }
 
@@ -121,13 +126,20 @@ public class CrawlingBroadActivity extends AppCompatActivity {
     }
 
     //웹페이지에서 크롤링하기
-    private void getDataFromWebPage(Document document){
+    private void getDataFromWebPage(Document document, int STEP){
         // 팀노바 오픈 카페 작품 페이지에서 게시글이 있는 부분만 크롤링 함.
         Elements broad_list = document.select("#main-area > ul.article-movie-sub > li");
 
         Log.v("크롤링", "크롤링한 개시글 갯수 = " + broad_list.size());
 
         for (int i = 0; i < broad_list.size(); i++){
+
+            String title = broad_list.get(i).getElementsByClass("inner").text();
+            String writer = broad_list.get(i).getElementsByClass("m-tcol-c").text();
+            String create_date = broad_list.get(i).getElementsByClass("date").text();
+            int view_count = Integer.parseInt(broad_list.get(i).getElementsByClass("num").get(0).text().split(" ")[1]);
+            int reply_count = Integer.parseInt(broad_list.get(i).getElementsByClass("comment_area").text().split(" ")[1]);
+            int like_count = Integer.parseInt(broad_list.get(i).getElementsByClass("u_cnt num-recomm").text());
 
             Log.v(TAG, "------------------------------------------------------------ " + (i + 1) + "번째 게시글 -----------------------------------------------------------------");
 
@@ -153,7 +165,7 @@ public class CrawlingBroadActivity extends AppCompatActivity {
             Log.v(TAG, "좋아요수: " + broad_list.get(i).getElementsByClass("u_cnt num-recomm").text());
 
             //게시글 url
-            String post_url = "https://cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
+            String post_url = "https://m.cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
             Log.v(TAG, "게시글 태그: " + post_url);
 
             Document image_tag = Jsoup.parse(broad_list.get(i).getElementsByClass("movie-img").html());
@@ -164,12 +176,13 @@ public class CrawlingBroadActivity extends AppCompatActivity {
             // 동영상 1개 --> "동영상"
             // 동영상 2개 --> "동영상 1개의 추가 이미지가 있습니다"
             // 동영상 3개 --> "동영상 2개의 추가 이미지가 있습니다"
+            String img_url = "";
             if(image_tag.text().contains("동영상")){
                 // "img"태그에 접근
                 Elements img_tag = image_tag.select("a > img");
 
                 // "img"태그의 "src" 값을 저장
-                String img_url = img_tag.get(0).attr("src");
+                img_url = img_tag.get(0).attr("src");
 
                 // 동영상 썸네일 url
                 Log.v(TAG, "썸네일 url: " + img_url);
@@ -177,11 +190,14 @@ public class CrawlingBroadActivity extends AppCompatActivity {
             }
             else {
                 // "img"태그의 "src" 값을 저장
-                String img_url = null;
+//                img_url = null;
 
                 // 동영상 썸네일 url
                 Log.v(TAG, "썸네일 url: " + img_url);
             }
+
+            // DB에 데이터 들어감.
+            databaseHelper.insertRankData(title,writer,create_date,post_url,img_url,view_count,like_count,reply_count,STEP);
 
 
         }

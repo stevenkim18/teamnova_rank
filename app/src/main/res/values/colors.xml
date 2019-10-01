@@ -3,4 +3,16 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="teamnovaYellow">#F1E850</color>
+
+    <color name="colorGray0">#f8f9fa</color>
+    <color name="colorGray1">#f1f3f5</color>
+    <color name="colorGray2">#e9ecef</color>
+    <color name="colorGray3">#dee2e6</color>
+    <color name="colorGray4">#ced4da</color>
+    <color name="colorGray5">#adb5bd</color>
+    <color name="colorGray6">#868e96</color>
+    <color name="colorGray7">#495057</color>
+    <color name="colorGray8">#343a40</color>
+    <color name="colorGray9">#212529</color>
 </resources>

@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 65474;
+    private static final int DATABASE_VERSION = 65478;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -312,7 +312,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         contentValues.put(RANK_TYPE           ,rankType);
         contentValues.put(RANK_RANK_POINT     ,viewCount + (likeCount * 5));
 
-        Log.d(TAG,"등록 제목 :"+rankTitle);
         //데이터 목록 등록
         database.insert(TABLE_NAME_RANK, null, contentValues);
 

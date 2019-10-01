@@ -24,7 +24,7 @@
             android:fontFamily="@font/title_font"
             android:paddingLeft="6dp"
             android:text="TeamNova RANKING"
-            android:textSize="30sp"
+            android:textSize="31sp"
             android:textStyle="bold"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

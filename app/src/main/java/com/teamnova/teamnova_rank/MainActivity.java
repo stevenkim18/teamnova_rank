@@ -26,8 +26,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -564,10 +567,13 @@ public class MainActivity extends BaseActivity {
 
                 return true;
 
-            //목록버튼을 클릭한경우
+             //목록버튼을 클릭한경우
             case R.id.action_refresh:
                 //listDialog();
-
+                for(int updateCrawlUrlNum : Constant.CAFE_TEAMNOVA_NUMBER_LIST){
+                    JsoupAsyncTask jsoupAsyncTask = new MainActivity.JsoupAsyncTask();
+                    jsoupAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,updateCrawlUrlNum);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -631,4 +637,126 @@ public class MainActivity extends BaseActivity {
         builder.show();//다이어로그 보여주기
     }
 
+    private class JsoupAsyncTask extends AsyncTask<Integer, Void, Void>{
+
+        // AsyncTask 실행 전
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressOn("전체 데이터를 가져오는 중입니다...");
+        }
+
+        // AsyncTask 실행
+        @Override
+        protected Void doInBackground(Integer... voids) {
+            int url_num = voids[0];
+            try {
+
+//                for(int url_num = 0; url_num < Constant.CAFE_TEAMNOVA_URL_LIST.size(); url_num++){
+                    databaseHelper.deleteRankData(url_num);
+
+                    int page_num = 0;
+
+                    while (true){
+
+                        try {
+                            Thread.sleep(30);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        //페이지 1증가
+                        page_num++;
+
+                        // 각 작품의 페이지 url 과 페이지 숫자를 합침.
+                        //ex) "https://cafe.naver.com/ArticleList.nhn?search.clubid=29412673&search.menuid=22&search.boardtype=C&search.totalCount=151&search.page=10"
+                        String crawlingUrl = Constant.CAFE_TEAMNOVA_URL_LIST.get(url_num) + page_num;
+
+                        // url 주소로 html 파일 가지고 오기
+                        Document document = Jsoup.connect(crawlingUrl).get();
+
+                        // 해당 페이지 게시물에 없을 때는 크롤링 멈춤.
+                        if(document.select("#main-area > ul.article-movie-sub > li").size() == 0){
+                            break;
+                        }
+
+                        // 크롤링 시작
+                        getDataFromWebPage(document, url_num);
+
+                    }
+
+//                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        // AsyncTask 실행 후
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            progressOFF();
+        }
+    }
+
+    //웹페이지에서 크롤링하기
+    private void getDataFromWebPage(Document document, int STEP){
+        // 팀노바 오픈 카페 작품 페이지에서 게시글이 있는 부분만 크롤링 함.
+        Elements broad_list = document.select("#main-area > ul.article-movie-sub > li");
+
+        for (int i = 0; i < broad_list.size(); i++){
+
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // 게시글 제목
+            String title = broad_list.get(i).getElementsByClass("inner").text().replace("[JAVA]","").replace("[Android]","").replace("[PHP]","").replace("[","\n[");
+
+            // 작성자
+            String writer = broad_list.get(i).getElementsByClass("m-tcol-c").text();
+
+            // 게시 날짜
+            String create_date = broad_list.get(i).getElementsByClass("date").text();
+
+            // 조회수
+            // 조회수와 댓글수의 tag class 가 모두 "num"으로 되어 있기 때문에 get(0)을 해서 조회수 값만 가지고 옴.
+            // 조회수 값을 크롤링 할 때 숫자 앞에 "조회" 텍스트가 같이 와서 띄어쓰기로 쪼갠 후 숫자 값만 가지고 옴.
+            int view_count = Integer.parseInt(broad_list.get(i).getElementsByClass("num").get(0).text().split(" ")[1]);
+
+            // 댓글 수
+            // 댓글수 값을 크롤링 할 때 숫자 앞에 "댓글" 텍스트가 같이 와서 띄어쓰기로 쪼갠 후 숫자 값만 가지고 옴.
+            int reply_count = Integer.parseInt(broad_list.get(i).getElementsByClass("comment_area").text().split(" ")[1]);
+
+            // 좋아요 수
+            int like_count = Integer.parseInt(broad_list.get(i).getElementsByClass("u_cnt num-recomm").text());
+
+            //게시글 url
+            String post_url = "https://m.cafe.naver.com/teamnovaopen" + broad_list.get(i).getElementsByClass("tit").attr("href");
+
+            Document image_tag = Jsoup.parse(broad_list.get(i).getElementsByClass("movie-img").html());
+
+            // 동영상이 2개 이상 올린 게시글이 있어서 이미지태그에 "동영상" 이라는 텍스트가 포함 되면 썸네일 주소를 가지고 옴.
+            // 동영상 1개 --> "동영상"
+            // 동영상 2개 --> "동영상 1개의 추가 이미지가 있습니다"
+            // 동영상 3개 --> "동영상 2개의 추가 이미지가 있습니다"
+            String img_url = "";
+            if(image_tag.text().contains("동영상")){
+                // "img"태그에 접근
+                Elements img_tag = image_tag.select("a > img");
+
+                // "img"태그의 "src" 값을 저장
+                img_url = img_tag.get(0).attr("src");
+
+            }
+            // DB에 데이터 들어감.
+            databaseHelper.insertRankData(title,writer,create_date,post_url,img_url,view_count,like_count,reply_count,STEP);
+
+
+        }
+
+    }
 }

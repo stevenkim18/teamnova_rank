@@ -2,6 +2,7 @@ package com.teamnova.teamnova_rank;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     boolean isHard2Complete = false;
 
     int javaCrawlUrlLength = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -165,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 currentNum = 0;
 
                 RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
 
@@ -217,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
                                     javaCrawlUrlLength--;
                                     if(isAndroidComplete && javaCrawlUrlLength == 0 && currentNum == 1){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_ANDROID, true);
+                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
@@ -283,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
                                     javaCrawlUrlLength--;
                                     if(isPHPComplete && javaCrawlUrlLength == 0 && currentNum == Constant.RANK_TYPE_BASIC_PHP){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_PHP, true);
+                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
@@ -347,6 +352,7 @@ public class MainActivity extends AppCompatActivity {
                                     javaCrawlUrlLength--;
                                     if(isHard1Complete && javaCrawlUrlLength == 0 && currentNum == 3){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_1, true);
+                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
@@ -414,6 +420,7 @@ public class MainActivity extends AppCompatActivity {
                                     javaCrawlUrlLength--;
                                     if(isHard2Complete && javaCrawlUrlLength == 0 && currentNum == 4){
                                         databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_2, true);
+                                        RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                                         RankRecyclerviewAdapter.notifyDataSetChanged();
                                     }
@@ -496,6 +503,29 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
+        // searchView 생성
+        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
+        // 검색 버튼을 눌렀을 때 뷰가 꽉차게 해주기
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+
+        // searchView 힌트
+        searchView.setQueryHint("이름 검색");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                RankRecyclerviewAdapter.getFilter().filter(newText);
+
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -504,14 +534,14 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             //검색버튼을 클릭한경우
-            case R.id.main_search:
+            case R.id.action_search:
 
-                Toast.makeText(getApplicationContext(), "검색하기", Toast.LENGTH_SHORT).show();
                 return true;
 
             //목록버튼을 클릭한경우
-            case R.id.main_list:
-                listDialog();
+            case R.id.action_refresh:
+                //listDialog();
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -1,18 +1,14 @@
 package com.teamnova.teamnova_rank;
 
-import android.app.Activity;
 import android.content.Context;
-import android.os.Build;
-import android.util.Log;
 import android.view.Gravity;
-import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,10 +21,11 @@ import java.util.List;
 
 import io.github.douglasjunior.androidSimpleTooltip.SimpleTooltip;
 
-public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclerviewAdapter.MyViewholder> {
+public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclerviewAdapter.MyViewholder> implements Filterable {
 
 
-    private List<RankData> rankDataList; //랭크데이터 리스트 변수
+    private List<RankData> rankDataList = null; //랭크데이터 리스트 변수
+    private List<RankData> fullList = null;     // 전체 링크 데이터를 담는 변수
     private OnclickItemListener onClickItemListener;
     private Context context;
     private Boolean isToolTipshowed;
@@ -42,7 +39,13 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
     public void setOnClickItemListener(
             OnclickItemListener onClickItemListener) {
         this.onClickItemListener = onClickItemListener;
+
     }
+
+    public interface OnclickItemListener {
+        void clickDetaiInfo(RankData rankData);
+    }
+
 
     public RankRecyclerviewAdapter(Context context, List<RankData> rank_data_list) {
         this.rankDataList = rank_data_list;
@@ -50,9 +53,10 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
         isToolTipshowed = true;
     }
 
-    public interface OnclickItemListener {
-        void clickDetaiInfo(RankData rankData);
+    public void setFullListAdapter(ArrayList<RankData> list){
+        this.fullList = new ArrayList<>(list);
     }
+
 
     //배열 사이즈 정해주기
     @Override
@@ -195,19 +199,59 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
     private void showTooltip(View view, Boolean isToolTipshowed) {
 
         // 처음에 툴팁을 한번만 보여주기 위해서 사용.
-        isToolTipshowed = false;
+        this.isToolTipshowed = false;
 
         if (isToolTipshowed) {
             new SimpleTooltip.Builder(context)
                     .anchorView(view)
-                    .text("Ranking Point")                 // 툴팁 메시지
-                    .gravity(Gravity.TOP)                  // 툴팁 방향
+                    .text("게시물의 조회수, 좋아요,\n 댓글을 반영한 점수")                 // 툴팁 메시지
+                    .gravity(Gravity.TOP)                                                // 툴팁 방향
                     .animated(true)
-                    .transparentOverlay(false)             // 배경을 회색으로 할껀지
+                    .transparentOverlay(false)                                           // 배경을 회색으로 할껀지
                     .build()
                     .show();
-
         }
 
     }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+
+            ArrayList<RankData> filterRankData = new ArrayList<>();
+
+            if(constraint == null || constraint.length() == 0){
+                filterRankData.addAll(fullList);
+            }
+            else {
+                String filterPattern = constraint.toString().toLowerCase().trim();
+
+                for(RankData rankData : fullList){
+
+                    if(rankData.getRankTitle().contains(filterPattern)){
+
+                        filterRankData.add(rankData);
+
+                    }
+
+                }
+            }
+
+            FilterResults results = new FilterResults();
+            results.values = filterRankData;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            rankDataList.clear();
+            rankDataList.addAll((ArrayList<RankData>)results.values);
+            notifyDataSetChanged();
+        }
+    };
 }

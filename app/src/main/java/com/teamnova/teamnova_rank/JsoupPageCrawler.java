@@ -90,5 +90,3 @@ public class JsoupPageCrawler extends AsyncTask<Integer, Integer, Integer> {
     }
 
 }
-
-

@@ -53,7 +53,7 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
         isToolTipshowed = true;
     }
 
-    public void setFullListAdapter(ArrayList<RankData> list){
+    public void setFullListAdapter(List<RankData> list){
         this.fullList = new ArrayList<>(list);
     }
 
@@ -233,7 +233,7 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
 
                 for(RankData rankData : fullList){
 
-                    if(rankData.getRankTitle().contains(filterPattern)){
+                    if(rankData.getRankWriter().contains(filterPattern)){
 
                         filterRankData.add(rankData);
 

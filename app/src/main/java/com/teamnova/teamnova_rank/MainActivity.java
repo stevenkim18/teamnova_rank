@@ -149,6 +149,7 @@ public class MainActivity extends BaseActivity {
         }
 
         RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
+        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicJavaStepList());
         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
@@ -169,7 +170,7 @@ public class MainActivity extends BaseActivity {
                 currentNum = 0;
 
                 RankRecyclerview.smoothScrollToPosition(0);
-                RankRecyclerviewAdapter.setFullListAdapter((ArrayList<RankData>) databaseHelper.selectBasicJavaStepList());
+                RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
 

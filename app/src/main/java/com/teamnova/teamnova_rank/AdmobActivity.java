@@ -552,7 +552,16 @@ public class AdmobActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            String title = broad_list.get(i).getElementsByClass("inner").text();
+            String title = broad_list.get(i).getElementsByClass("inner").text().replace("[JAVA]","").replace("[Android]","").replace("[PHP]","").replace("[안드로이드]","").replace("[","\n[");
+            String stepStr = "";
+            if(STEP == 0){
+                stepStr = "JAVA";
+            }else if(STEP == 1){
+                stepStr = "Android";
+            }else if(STEP == 2){
+                stepStr = "PHP";
+            }
+            title = title.replace("기초단계", stepStr).replace("기초 단계",stepStr);
             String writer = broad_list.get(i).getElementsByClass("m-tcol-c").text();
             String create_date = broad_list.get(i).getElementsByClass("date").text();
             int view_count = Integer.parseInt(broad_list.get(i).getElementsByClass("num").get(0).text().split(" ")[1]);

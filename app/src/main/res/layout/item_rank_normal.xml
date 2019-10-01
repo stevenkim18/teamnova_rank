@@ -22,7 +22,7 @@
             <TextView
                 android:id="@+id/normal_ranking"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:text="4"
                 android:textAlignment="center"
                 android:textSize="26sp"

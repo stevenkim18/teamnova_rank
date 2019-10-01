@@ -95,7 +95,7 @@ public class JsoupPageCrawler extends AsyncTask<Integer, Integer, Integer> {
         Elements broad_list = document.select("#main-area > ul.article-movie-sub > li");
         for (int i = 0; i < broad_list.size(); i++){
 
-            // sleep 시간을 조절해서 아이피 차단을 피해야 한다. 계속 수정중...
+            // sleep 시간을 조절해서 아이피 차단을 피해야 한다. 계속 수정중. ..
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {

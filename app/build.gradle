@@ -26,6 +26,7 @@ dependencies {
     implementation 'com.android.support:design:29.0.0' //디자인 추가
     implementation "com.airbnb.android:lottie:3.0.7"     //로띠 라이브러리 추가
     testImplementation 'junit:junit:4.12'
+    implementation 'com.github.bumptech.glide:glide:4.10.0'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.android.gms:play-services-ads:18.2.0' //애드몹

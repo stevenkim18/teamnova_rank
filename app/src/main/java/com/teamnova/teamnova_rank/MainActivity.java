@@ -8,10 +8,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,8 +25,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jsoup.nodes.Document;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -57,6 +66,19 @@ public class MainActivity extends AppCompatActivity {
 
     private int currentNum = 0;
 
+    /* 멀티 쓰레드 */
+    private static final int CORE_POOL_SIZE = 5;
+    private static final int MAXIMUM_POOL_SIZE = 128;
+    private static final ThreadPoolExecutor executor
+            = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, 60, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+
+    boolean isJavaComplete = false;
+    boolean isAndroidComplete = false;
+    boolean isPHPComplete = false;
+    boolean isHard1Complete = false;
+    boolean isHard2Complete = false;
+
+    int javaCrawlUrlLength = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -72,11 +94,6 @@ public class MainActivity extends AppCompatActivity {
         mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
-/*        rankName = findViewById(R.id.rank_name);
-        rankLike = findViewById(R.id.rank_like);
-        rankReply = findViewById(R.id.rank_reply);
-        rankView = findViewById(R.id.rank_view);*/
-
         mainToolbar = findViewById(R.id.main_toolbar);
 
         mainJavaStepBtn.setSelected(true);
@@ -87,12 +104,52 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);//종류는 총 3가지, ListView를 사용하기 위한 사용
         RankRecyclerview.setHasFixedSize(true);//각 아이템이 보여지는 것을 일정하게
         RankRecyclerview.setLayoutManager(llm);//앞서 선언한 리싸이클러뷰를 레이아웃메니저에 붙힌다
-        
-        RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
 
+        /* 데이터를 저장한 기록이 있는지 확인한다. */
+        String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(Constant.RANK_TYPE_BASIC_JAVA);
+        if("".equals(lastUpdate)){
+
+            // 가져올 데이터가 없다면 크롤링 시작
+            JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
+            jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
+            jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
+                @Override
+                public void onProgressUpdate(Integer integer, Document document) {
+
+                    if(integer == -1){
+                        isJavaComplete = true;
+                    }else{
+                        javaCrawlUrlLength ++;
+                    }
+                    JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_JAVA,databaseHelper);
+                    jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
+                        @Override
+                        public void onPostExecute() {
+                            javaCrawlUrlLength--;
+                            if(isJavaComplete && javaCrawlUrlLength == 0 && currentNum == 0){
+                                // 크롤링 성공 저장
+                                databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_JAVA, true);
+                                RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
+                                RankRecyclerviewAdapter.notifyDataSetChanged();
+                            }
+                        }
+                    });
+                    if(!isJavaComplete)
+                        jsoupPageCrawler.executeOnExecutor(executor);
+                }
+            });
+            jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_JAVA);
+//            jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_JAVA);
+        }else{
+            mRankData = databaseHelper.selectBasicJavaStepList();
+        }
+
+        RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
         RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
+
+
 
 //        makeTestData();
 
@@ -105,9 +162,9 @@ public class MainActivity extends AppCompatActivity {
                 if (currentNum == 0) {
                     return;
                 }
-
                 currentNum = 0;
-                RankRecyclerview.scrollToPosition(0);
+
+                RankRecyclerview.smoothScrollToPosition(0);
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
 
@@ -138,7 +195,41 @@ public class MainActivity extends AppCompatActivity {
 
                 currentNum = 1;
 
-                RankRecyclerview.scrollToPosition(0);
+                /* 데이터를 저장한 기록이 있는지 확인한다. */
+                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
+                if("".equals(lastUpdate)){
+
+                    // 가져올 데이터가 없다면 크롤링 시작
+                    JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
+                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
+                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
+                        @Override
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isAndroidComplete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_ANDROID,databaseHelper);
+                            jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
+                                @Override
+                                public void onPostExecute() {
+                                    javaCrawlUrlLength--;
+                                    if(isAndroidComplete && javaCrawlUrlLength == 0 && currentNum == 1){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_ANDROID, true);
+                                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
+                                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                            if(!isAndroidComplete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
+                        }
+                    });
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_ANDROID);
+                }
+
+                RankRecyclerview.smoothScrollToPosition(0);
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
 
@@ -169,7 +260,43 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 2;
-                RankRecyclerview.scrollToPosition(0);
+
+                /* 데이터를 저장한 기록이 있는지 확인한다. */
+                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
+                if("".equals(lastUpdate)){
+
+                    // 가져올 데이터가 없다면 크롤링 시작
+                    JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
+                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
+                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
+                        @Override
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isPHPComplete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_BASIC_PHP,databaseHelper);
+                            jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
+                                @Override
+                                public void onPostExecute() {
+                                    javaCrawlUrlLength--;
+                                    if(isPHPComplete && javaCrawlUrlLength == 0 && currentNum == Constant.RANK_TYPE_BASIC_PHP){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_BASIC_PHP, true);
+                                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
+                                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                            if(!isPHPComplete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
+                        }
+                    });
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_PHP);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_PHP);
+                }
+
+                RankRecyclerview.smoothScrollToPosition(0);
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
@@ -197,7 +324,43 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum =3;
-                RankRecyclerview.scrollToPosition(0);
+
+                /* 데이터를 저장한 기록이 있는지 확인한다. */
+                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
+                if("".equals(lastUpdate)){
+
+                    // 가져올 데이터가 없다면 크롤링 시작
+                    JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
+                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
+                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
+                        @Override
+                        public void onProgressUpdate(Integer integer, Document document) {
+                            if(integer == -1){
+                                isHard1Complete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_HARD_1,databaseHelper);
+                            jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
+                                @Override
+                                public void onPostExecute() {
+                                    javaCrawlUrlLength--;
+                                    if(isHard1Complete && javaCrawlUrlLength == 0 && currentNum == 3){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_1, true);
+                                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
+                                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                            if(!isHard1Complete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
+                        }
+                    });
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_1);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_1);
+                }
+
+                RankRecyclerview.smoothScrollToPosition(0);
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
@@ -227,7 +390,44 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 4;
-                RankRecyclerview.scrollToPosition(0);
+
+                /* 데이터를 저장한 기록이 있는지 확인한다. */
+                String lastUpdate = databaseHelper.selectLastCourseTypeUpdateDate(currentNum);
+                if("".equals(lastUpdate)){
+
+                    // 가져올 데이터가 없다면 크롤링 시작
+                    JsoupPageCrawler jsoupAsyncCrawler = new JsoupPageCrawler();
+                    jsoupAsyncCrawler.setDatabaseHelper(databaseHelper);
+                    jsoupAsyncCrawler.setJsoupAsyncListener(new JsoupPageCrawler.JsoupAsyncListener() {
+                        @Override
+                        public void onProgressUpdate(final Integer integer, Document document) {
+                            if(integer == -1){
+                                isHard2Complete = true;
+                            }else{
+                                javaCrawlUrlLength ++;
+                            }
+
+                            JsoupDocumentCrawler jsoupPageCrawler = new JsoupDocumentCrawler(document,Constant.RANK_TYPE_HARD_2,databaseHelper);
+                            jsoupPageCrawler.setJsoupDocumentListener(new JsoupDocumentCrawler.JsoupDocumentListener() {
+                                @Override
+                                public void onPostExecute() {
+                                    javaCrawlUrlLength--;
+                                    if(isHard2Complete && javaCrawlUrlLength == 0 && currentNum == 4){
+                                        databaseHelper.insertCrawlScheme(Constant.RANK_TYPE_HARD_2, true);
+                                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
+                                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                            if(!isHard2Complete)
+                                jsoupPageCrawler.executeOnExecutor(executor);
+                        }
+                    });
+                    jsoupAsyncCrawler.execute(Constant.RANK_TYPE_HARD_2);
+//                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_2);
+                }
+
+                RankRecyclerview.smoothScrollToPosition(0);
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {

@@ -1,5 +1,8 @@
 package com.teamnova.teamnova_rank;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 클래스 명 : Constant class
  * 설명 : 상수를 기록해놓은 클래스이다.
@@ -36,4 +39,12 @@ public class Constant {
     // 응용 2단계 작품
     public static final String CAFE_TEAMNOVA_HARD2_URL = "https://cafe.naver.com/ArticleList.nhn?search.clubid=29412673&search.menuid=24&search.boardtype=C&search.totalCount=31&search.page=";
 
+    // 팀노바 카페 목록 리스트
+    public static final List<String> CAFE_TEAMNOVA_URL_LIST = new ArrayList<String>(){{
+        add(CAFE_TEAMNOVA_JAVA_URL);
+        add(CAFE_TEAMNOVA_ANDROID_URL);
+        add(CAFE_TEAMNOVA_PHP_URL);
+        add(CAFE_TEAMNOVA_HARD1_URL);
+        add(CAFE_TEAMNOVA_HARD2_URL);
+    }};
 }

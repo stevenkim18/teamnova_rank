@@ -44,7 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
 
     /* 데이터베이스 버전 및 이름 */
-    private static final int DATABASE_VERSION = 67;
+    private static final int DATABASE_VERSION = 65467;
     private static final String DATABASE_NAME = "teamnova_rank.db";
 
     /* 테이블 명*/
@@ -127,6 +127,26 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
         onCreate(db);
     }
 
+    public String selectLastCourseTypeUpdateDate(int COURSE_TYPE){
+        String query = "";
+        query = "SELECT " +
+                    CRAWL_SCHEME_CRAWL_DATE +
+                " FROM " +
+                    TABLE_NAME_CRAWL_SCHEME +
+                " WHERE " +
+                    CRAWL_SCHEME_CRAWL_SUCCESS + " = '1'" +
+                    " AND " + CRAWL_SCHEME_CRAWL_COURSE_TYPE + " = " + COURSE_TYPE +
+                " ORDER BY " +
+                    CRAWL_SCHEME_CRAWL_ID + " DESC LIMIT 1";
+        Log.d(TAG, "selectLastCourseTypeUpdateDate 쿼리 : "+query);
+        Cursor cursor = database.rawQuery(query,null);
+        String result = "";
+        if(cursor != null && cursor.moveToFirst()){
+            result = cursor.getString(cursor.getColumnIndex(CRAWL_SCHEME_CRAWL_DATE));
+            cursor.close();
+        }
+        return result;
+    }
 
     /**
      * 마지막 업데이트 날짜를 가져온다.
@@ -142,7 +162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                         CRAWL_SCHEME_CRAWL_DATE +
                 " HAVING " +
                         "COUNT("+CRAWL_SCHEME_CRAWL_DATE+") == 5";
-
+        Log.d(TAG, "selectLastUpdateDate 쿼리 : "+query);
         Cursor cursor = database.rawQuery(query,null);
         String result = "";
         if(cursor != null && cursor.moveToFirst()){
@@ -297,6 +317,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
 
     }
 
+
     /**
      * 개인별 작품 평균 점수로 순위를 매긴 목록을 반환한다.
      * @return
@@ -319,7 +340,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
                         ", SUM("+RANK_RANK_POINT+")/COUNT("+RANK_WRITER+") AS "+RANK_RANK_POINT+
                         ",COUNT("+RANK_RANK_ID+") AS WORK_COUNT"+
                 " FROM " +
-                        TABLE_NAME_RANK+
+                        TABLE_NAME_RANK+" RIT" +
                 " GROUP BY "+
                         RANK_WRITER+
                 " ORDER BY "+
@@ -339,6 +360,19 @@ public class DatabaseHelper extends SQLiteOpenHelper implements RankDataInterfac
             resultList.add(rankData);
         }
         return resultList;
+    }
+
+    /**
+     * 작성자 이름 또는 작품명으로 검색한 결과를 반환한다.
+     *
+     * @return
+     */
+    @Override
+    public List<RankData> selectRankListBySearchText() {
+        List<RankData> resultList = new ArrayList<>();
+        String query = "";
+
+        return null;
     }
 
     /**

@@ -574,6 +574,7 @@ public class MainActivity extends BaseActivity {
                     JsoupAsyncTask jsoupAsyncTask = new MainActivity.JsoupAsyncTask();
                     jsoupAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,updateCrawlUrlNum);
                 }
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -638,7 +639,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private class JsoupAsyncTask extends AsyncTask<Integer, Void, Void>{
-
+        int ASYNC_URL_NUM;
         // AsyncTask 실행 전
         @Override
         protected void onPreExecute() {
@@ -650,11 +651,13 @@ public class MainActivity extends BaseActivity {
         @Override
         protected Void doInBackground(Integer... voids) {
             int url_num = voids[0];
+            ASYNC_URL_NUM = url_num;
             try {
 
 //                for(int url_num = 0; url_num < Constant.CAFE_TEAMNOVA_URL_LIST.size(); url_num++){
                     databaseHelper.deleteRankData(url_num);
 
+                    databaseHelper.insertCrawlScheme(url_num, true);
                     int page_num = 0;
 
                     while (true){
@@ -697,7 +700,41 @@ public class MainActivity extends BaseActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            progressOFF();
+            if(ASYNC_URL_NUM == Constant.RANK_TYPE_BASIC_JAVA){
+                switch (currentNum){
+                    case Constant.RANK_TYPE_BASIC_JAVA :
+                        RankRecyclerview.smoothScrollToPosition(0);
+                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicJavaStepList());
+                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
+                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                        break;
+                    case Constant.RANK_TYPE_BASIC_ANDROID:
+                        RankRecyclerview.smoothScrollToPosition(0);
+                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicAndroidStepList());
+                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
+                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                        break;
+                    case Constant.RANK_TYPE_BASIC_PHP:
+                        RankRecyclerview.smoothScrollToPosition(0);
+                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicPhpStepList());
+                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
+                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                        break;
+                    case Constant.RANK_TYPE_HARD_1:
+                        RankRecyclerview.smoothScrollToPosition(0);
+                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep1List());
+                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
+                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                        break;
+                    case Constant.RANK_TYPE_HARD_2:
+                        RankRecyclerview.smoothScrollToPosition(0);
+                        RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep2List());
+                        RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
+                        RankRecyclerviewAdapter.notifyDataSetChanged();
+                        break;
+                }
+                progressOFF();
+            }
         }
     }
 

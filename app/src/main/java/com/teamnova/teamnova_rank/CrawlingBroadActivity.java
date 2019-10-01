@@ -134,7 +134,7 @@ public class CrawlingBroadActivity extends AppCompatActivity {
 
         for (int i = 0; i < broad_list.size(); i++){
 
-            String title = broad_list.get(i).getElementsByClass("inner").text();
+            String title = broad_list.get(i).getElementsByClass("inner").text().replace("[JAVA]","").replace("[Android]","").replace("[PHP]","").replace("[","\n[");
             String writer = broad_list.get(i).getElementsByClass("m-tcol-c").text();
             String create_date = broad_list.get(i).getElementsByClass("date").text();
             int view_count = Integer.parseInt(broad_list.get(i).getElementsByClass("num").get(0).text().split(" ")[1]);

@@ -16,7 +16,7 @@ public class JsoupPageCrawler extends AsyncTask<Integer, Integer, Integer> {
     public Document pageDocument;
 
     public interface JsoupAsyncListener{
-        void onPostExecute(Integer integer,Document pageDocument);
+        void onProgressUpdate(Integer integer,Document pageDocument);
     }
 
     public void setJsoupAsyncListener(JsoupAsyncListener jsoupAsyncListener) {
@@ -54,6 +54,7 @@ public class JsoupPageCrawler extends AsyncTask<Integer, Integer, Integer> {
 
                 // 해당 페이지 게시물에 없을 때는 크롤링 멈춤.
                 if(document.select("#main-area > ul.article-movie-sub > li").size() == 0){
+                    publishProgress(-1);
                     break;
                 }
 
@@ -68,8 +69,6 @@ public class JsoupPageCrawler extends AsyncTask<Integer, Integer, Integer> {
             // 크롤링 실패 저장
             databaseHelper.insertCrawlScheme(RANK_TYPE, false);
         }
-        // 크롤링 성공 저장
-        databaseHelper.insertCrawlScheme(RANK_TYPE, true);
         return RANK_TYPE;
     }
 
@@ -77,7 +76,7 @@ public class JsoupPageCrawler extends AsyncTask<Integer, Integer, Integer> {
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
         if(jsoupAsyncListener != null)
-            jsoupAsyncListener.onPostExecute(values[0],pageDocument);
+            jsoupAsyncListener.onProgressUpdate(values[0],pageDocument);
     }
 
     @Override

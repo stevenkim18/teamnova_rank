@@ -11,6 +11,15 @@ public class JsoupDocumentCrawler extends AsyncTask<Void, Void, Void > {
     public Document document;
     public int RANK_TYPE;
     public DatabaseHelper databaseHelper;
+    public JsoupDocumentListener jsoupDocumentListener;
+
+    public void setJsoupDocumentListener(JsoupDocumentListener jsoupDocumentListener) {
+        this.jsoupDocumentListener = jsoupDocumentListener;
+    }
+
+    public interface JsoupDocumentListener{
+        void onPostExecute();
+    }
 
     public JsoupDocumentCrawler(Document document, int RANK_TYPE, DatabaseHelper databaseHelper) {
         this.document = document;
@@ -66,6 +75,9 @@ public class JsoupDocumentCrawler extends AsyncTask<Void, Void, Void > {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        Log.d("완료","완료");
+        Log.d("JsoupDocumentCrawler","완료");
+        if(jsoupDocumentListener != null)
+            jsoupDocumentListener.onPostExecute();
+
     }
 }

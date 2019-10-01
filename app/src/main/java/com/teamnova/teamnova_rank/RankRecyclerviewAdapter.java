@@ -31,7 +31,6 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
     private List<RankData> rankDataList; //랭크데이터 리스트 변수
     private OnclickItemListener onClickItemListener;
     private Context context;
-
     private Boolean isToolTipshowed;
 
 
@@ -59,8 +58,8 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
     @Override
     public int getItemCount() {
 
-        //디버그 if null값이라면 return 0 ;
-  /*      if(rankDataList==null){
+        /* 디버그 if null값이라면 return 0 ;
+       if(rankDataList==null){
             return 0;
 
         }else{
@@ -76,31 +75,24 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
     //MyViewholder 클래스정의
     public class MyViewholder extends RecyclerView.ViewHolder{
 
-        TextView rankTitle,rankPoint,noramalRanking,rankView,rankName,rankLike,rankReply;  //rankTitle:랭크 목록에 아이템에 있는 제목  ,rankPoint :랭크목록에 아이템에 있는 점수
-        ImageView rankImage;//rankImage:랭크 목록 아이템에 있는 썸네일 이미지
-        LottieAnimationView goldLottieAnimation,silverLottieAnimation,brownLottieAnimation;//goldLottieAnimation:금색트로피 모양의 로띠
-        ConstraintLayout rankNormalCl;//리사이클러뷰에 들어가는 아이템 컨스트레인트레이아웃
+        TextView rankTitle,rankPoint,noramalRanking;
+        ImageView rankImage;
+        LottieAnimationView goldLottieAnimation,silverLottieAnimation,brownLottieAnimation;
+        ConstraintLayout rankNormalCl;
 
 
         public MyViewholder(View itemview){
 
             super(itemview);
-            rankNormalCl = itemview.findViewById(R.id.rank_item_cl);
-            goldLottieAnimation = itemview.findViewById(R.id.gold_lottie_animation);
-            silverLottieAnimation = itemview.findViewById(R.id.silver_lottie_animation);
-            brownLottieAnimation = itemview.findViewById(R.id.brown_lottie_animation);
+            rankNormalCl = itemview.findViewById(R.id.rank_item_cl);  //랭크목록에 있는 아이템 컨스트레인트레이아웃
+            goldLottieAnimation = itemview.findViewById(R.id.gold_lottie_animation);//goldLottieAnimation:금색트로피 모양의 로띠
+            silverLottieAnimation = itemview.findViewById(R.id.silver_lottie_animation);//silverLottieAnimation:은색트로피 모양의 로띠
+            brownLottieAnimation = itemview.findViewById(R.id.brown_lottie_animation);//brownLottieAnimation:갈색트로피 모양의 로띠
 
-            rankTitle = itemview.findViewById(R.id.title_textView);
-            rankPoint = itemview.findViewById(R.id.ranking_point_textView);
-            rankImage = itemview.findViewById(R.id.imageView);
-            noramalRanking = itemview.findViewById(R.id.normal_ranking);
-
-
-            rankName = itemview.findViewById(R.id.rank_name);
-            rankLike = itemview.findViewById(R.id.rank_like);
-            rankReply = itemview.findViewById(R.id.rank_reply);
-            rankView = itemview.findViewById(R.id.rank_view);
-
+            rankTitle = itemview.findViewById(R.id.title_tv);//rankTitle:랭크 목록에 아이템에 있는 제목
+            rankPoint = itemview.findViewById(R.id.ranking_point_tv);//rankPoint :랭크목록에 아이템에 있는 점수
+            rankImage = itemview.findViewById(R.id.rank_thumb_path_img);//rankImage:랭크 목록 아이템에 있는 썸네일 이미지
+            noramalRanking = itemview.findViewById(R.id.normal_ranking);//normal레이아웃에 나오는 랭크 순위(예:4위부터는 숫자로 나온다)
 
         }
 
@@ -172,6 +164,7 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
             holder.brownLottieAnimation.setVisibility(View.VISIBLE);
         }
         else {
+            //랭킹 아이템 목록중에 랭킹순위 값을 연결해준다
             holder.noramalRanking.setText(data.getRanking()+"");
         }
 
@@ -180,22 +173,13 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
         holder.rankTitle.setText(data.getRankWriter()); //제목 보여주기
         holder.rankPoint.setText(data.getRankingPoint()+"");//점수 보여주기
 
-        Glide.with(context)
-                .load(data.getThumbPath())
-                .into(holder.rankImage);
+        //썸네일 url을 이미지로 가져온다
+        Glide.with(context).load(data.getThumbPath()).into(holder.rankImage);
+
 
         if(position == 0){
             showTooltip(holder.rankPoint, isToolTipshowed);
         }
-
-
-
-//        holder.rankImage.setImageURI(data.getThumbPath());
-
-//      holder.rankLike.setText(data.getLikeCount()+"");
-//        holder.rankReply.setText(data.getReplyCount()+"");
-//        holder.rankName.setText(data.getRankWriter());
-//        holder.rankView.setText(data.getViewCount()+"");
 
 
         //랭크목록에 있는 아이템을 선택했을때
@@ -203,18 +187,8 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
             @Override
             public void onClick(View view) {
                 onClickItemListener.clickDetaiInfo(data);
-//                Intent intent = new Intent(context,RankDescriptionActivity.class);
-//                intent.putExtra("rankData",data);
-
-//                intent.putExtra("작성자명",data.getRankWriter());
-            /*    intent.putExtra("좋아요",data.getLikeCount());
-                intent.putExtra("댓글 수",data.getReplyCount());
-                intent.putExtra("조회수",data.getViewCount());
-*/
             }
         });
-
-//      holder.rank_image.setImageURI(data.get());
 
     }
 

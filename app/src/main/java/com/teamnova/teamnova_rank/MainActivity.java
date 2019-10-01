@@ -75,11 +75,6 @@ public class MainActivity extends AppCompatActivity {
         mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
-/*        rankName = findViewById(R.id.rank_name);
-        rankLike = findViewById(R.id.rank_like);
-        rankReply = findViewById(R.id.rank_reply);
-        rankView = findViewById(R.id.rank_view);*/
-
         mainToolbar = findViewById(R.id.main_toolbar);
 
         mainJavaStepBtn.setSelected(true);
@@ -90,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         LinearLayoutManager llm = new LinearLayoutManager(this);//종류는 총 3가지, ListView를 사용하기 위한 사용
         RankRecyclerview.setHasFixedSize(true);//각 아이템이 보여지는 것을 일정하게
         RankRecyclerview.setLayoutManager(llm);//앞서 선언한 리싸이클러뷰를 레이아웃메니저에 붙힌다
-        RankRecyclerview.setLayoutManager(new LinearLayoutManagerWithSmoothScroller(this));
 
 
         RankRecyclerviewAdapter = new RankRecyclerviewAdapter(getApplicationContext() ,mRankData);//앞서 만든 리스트를 어뎁터에 적용시켜 객체를 만든다.
@@ -99,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
         RankRecyclerview.setAdapter(RankRecyclerviewAdapter);// 그리고 만든 겍체를 리싸이클러뷰에 적용시킨다.
         RankRecyclerviewAdapter.setOnClickItemListener(onClickItemListener);
 
-//        makeTestData();
 
         //메인 자바버튼 클릭한 경우
         mainJavaStepBtn.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 0;
-                RankRecyclerview.smoothScrollToPosition(0);
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
 
@@ -143,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
 
                 currentNum = 1;
 
-                RankRecyclerview.smoothScrollToPosition(0);
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
 
@@ -174,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 2;
-                RankRecyclerview.smoothScrollToPosition(0);
+
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
@@ -183,7 +174,6 @@ public class MainActivity extends AppCompatActivity {
                         mainJavaStepBtn.setSelected(false);
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(true);
-//                        mainPhpStepBtn.setClickable(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
@@ -202,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum =3;
-                RankRecyclerview.smoothScrollToPosition(0);
+
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
@@ -212,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
                         mainAndroidStepBtn.setSelected(false);
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(true);
-//                        mainHard1StepBtn.setClickable(false);
                         mainHard2StepBtn.setSelected(false);
                         break;
                 }
@@ -232,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 currentNum = 4;
-                RankRecyclerview.smoothScrollToPosition(0);
+
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
                 switch (view.getId()) {
@@ -243,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
                         mainPhpStepBtn.setSelected(false);
                         mainHard1StepBtn.setSelected(false);
                         mainHard2StepBtn.setSelected(true);
-//                        mainHard2StepBtn.setClickable(false);
                         break;
                 }
 
@@ -261,10 +249,8 @@ public class MainActivity extends AppCompatActivity {
     RankRecyclerviewAdapter.OnclickItemListener onClickItemListener = new RankRecyclerviewAdapter.OnclickItemListener() {
         @Override
         public void clickDetaiInfo(RankData rankData) {
-//            Intent intent = new Intent(MainActivity.this,RankDescriptionActivity.class);
-//            intent.putExtra("rankData",rankData);
-//            startActivity(intent);
-            Log.v("메인액티비티", "ID = " + rankData.getRankID());
+
+//            Log.v("메인액티비티", "ID = " + rankData.getRankID());
 
             showAlertDialog(rankData);
 
@@ -273,27 +259,19 @@ public class MainActivity extends AppCompatActivity {
 
     //리사이클러뷰 목록에 있는 작품 아이템을 선택하면 자세하게 보여주는 다이어로그
     private void showAlertDialog(RankData rankData) {
-//        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
-//        View layoutView = getLayoutInflater().inflate(R.layout.activity_rank_description, null);
-//        Button dialogButton = layoutView.findViewById(R.id.btnDialog); //다이어로그 btnDialog레이아웃보여준다
-//        dialogBuilder.setView(layoutView);
-//        alertDialog = dialogBuilder.create(); //다이어로그 생성
+/*        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+        View layoutView = getLayoutInflater().inflate(R.layout.activity_rank_description, null);
+        Button dialogButton = layoutView.findViewById(R.id.btnDialog); //다이어로그 btnDialog레이아웃보여준다
+        dialogBuilder.setView(layoutView);
+        alertDialog = dialogBuilder.create(); //다이어로그 생성*/
         //생성될때 선언하는 위치
         alertDialog = new RankDescriptionActivity(MainActivity.this);
         alertDialog.setRankData(rankData);
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-//        rankLike.setText(rankData.getLikeCount()+" ");
 
         alertDialog.show();
-        //확인 버튼 클릭시 다이어로그 사라짐
-//        dialogButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                alertDialog.dismiss();
-//            }
-//        });
     }
 
     //메인 툴바에 사용하기위한 옵션메뉴를 생성합니다
@@ -384,36 +362,11 @@ public class MainActivity extends AppCompatActivity {
 /*    //테스트하기위해서 만든 메소드입니다
     public void makeTestData() {
 
-//        mRankData = new ArrayList<>();
+        mRankData = new ArrayList<>();
 
         mRankData = databaseHelper.selectBasicAndroidStepList();
-//      mRankData.add(new RankData(rankID,rankTitle,rankWriter,createDate,detailLink,thumbPath,
-//      viewCount,likeCount,replyCount,rankType,ranking,rankPoint));
-
-
-//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 0));
-//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 0));
-//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,3, 0));
-//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,4, 0));
-//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 0));
-//        mRankData.add(new RankData(1, "제목","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 0));
-
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,1, 1000));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,2, 900));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,3, 800));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,4, 700));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,5, 600));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,6, 500));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,7, 400));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,8, 300));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,9, 200));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,10, 999));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,11, 10));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,12, 78));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,13, 1));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,14, 45));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,15, 9));
-        mRankData.add(new RankData(1, "[JAVA] 기초단계 -5기 김승우[담당강사 : 성훈파트장님]","작성자","만든날짜","URL링크","썸네일",0,0,0,0,16, 9999));
+      mRankData.add(new RankData(rankID,rankTitle,rankWriter,createDate,detailLink,thumbPath,
+      viewCount,likeCount,replyCount,rankType,ranking,rankPoint));
 
     }
 

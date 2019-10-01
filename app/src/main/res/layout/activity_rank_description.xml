@@ -58,11 +58,11 @@
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/rank_name"
+        app:layout_constraintRight_toLeftOf="@+id/writer_txt"
         />
 
     <TextView
-        android:id="@+id/rank_name"
+        android:id="@+id/writer_txt"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginTop="20dp"
@@ -82,12 +82,12 @@
         android:src="@drawable/like_icon"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
-        app:layout_constraintLeft_toRightOf="@+id/rank_name"
-        app:layout_constraintRight_toLeftOf="@+id/rank_like"
+        app:layout_constraintLeft_toRightOf="@+id/writer_txt"
+        app:layout_constraintRight_toLeftOf="@+id/like_txt"
         />
 
     <TextView
-        android:id="@+id/rank_like"
+        android:id="@+id/like_txt"
         android:layout_width="20dp"
         android:layout_height="22dp"
         android:layout_marginTop="20dp"
@@ -106,12 +106,12 @@
         android:layout_marginTop="20dp"
         android:src="@drawable/reply_icon"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toRightOf="@+id/rank_like"
-        app:layout_constraintRight_toLeftOf="@+id/rank_reply"
+        app:layout_constraintLeft_toRightOf="@+id/like_txt"
+        app:layout_constraintRight_toLeftOf="@+id/reply_txt"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img" />
 
     <TextView
-        android:id="@+id/rank_reply"
+        android:id="@+id/reply_txt"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
@@ -131,12 +131,12 @@
         android:src="@drawable/view_icon"
         android:layout_marginTop="20dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
-        app:layout_constraintLeft_toRightOf="@+id/rank_reply"
-        app:layout_constraintRight_toLeftOf="@+id/rank_view"
+        app:layout_constraintLeft_toRightOf="@+id/reply_txt"
+        app:layout_constraintRight_toLeftOf="@+id/view_txt"
         />
 
     <TextView
-        android:id="@+id/rank_view"
+        android:id="@+id/view_txt"
         android:layout_width="30dp"
         android:layout_height="40dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
@@ -150,7 +150,7 @@
         />
 
     <Button
-        android:id="@+id/btnDialog"
+        android:id="@+id/close_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -161,6 +161,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rank_view"/>
+        app:layout_constraintTop_toBottomOf="@+id/view_txt"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

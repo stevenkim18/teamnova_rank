@@ -24,7 +24,7 @@ public class RankDescriptionActivity extends Dialog {
     private  TextView rankView,rankName,rankLike,rankReply,dialogTitle;
     private ImageView thumbPathImg,playImgBtn;
     private RankData rankData;
-    private Button urlBtn;
+    private Button closeDialogBtn;
 
 
 
@@ -39,6 +39,7 @@ public class RankDescriptionActivity extends Dialog {
     public RankDescriptionActivity(@NonNull Context context) {
         super(context);
         Activity RankDescriptionActivity = (context instanceof Activity) ? (Activity)context:null;
+
         if(RankDescriptionActivity != null){
             this.RankDescriptionActivity =RankDescriptionActivity;
         }
@@ -52,61 +53,62 @@ public class RankDescriptionActivity extends Dialog {
         setContentView(R.layout.activity_rank_description);
 
 
-        rankName = findViewById(R.id.rank_name);
-        rankLike = findViewById(R.id.rank_like);
-        rankReply = findViewById(R.id.rank_reply);
-        rankView = findViewById(R.id.rank_view);
+        rankName = findViewById(R.id.writer_txt);
+        rankLike = findViewById(R.id.like_txt);
+        rankReply = findViewById(R.id.reply_txt);
+        rankView = findViewById(R.id.view_txt);
         thumbPathImg = findViewById(R.id.thumb_path_img);
-        urlBtn = findViewById(R.id.btnDialog);
+        closeDialogBtn = findViewById(R.id.close_btn);
         playImgBtn = findViewById(R.id.play_img_btn);
         dialogTitle = findViewById(R.id.dialog_title);
 
 
-        rankLike.setText(rankData.getLikeCount()+" ");
-        rankReply.setText(rankData.getReplyCount()+" ");
-        rankView.setText(rankData.getViewCount()+" ");
-        rankName.setText(rankData.getRankWriter());
-        dialogTitle.setText(rankData.getRankTitle());
+        rankLike.setText(rankData.getLikeCount()+" "); //좋아요수 값을 연결해준다
+        rankReply.setText(rankData.getReplyCount()+" ");//댓글수 값을 연결해준다
+        rankView.setText(rankData.getViewCount()+" ");//조회수 값을 연결해준다
+        rankName.setText(rankData.getRankWriter());//작성자명 값을 연결해준다
+        dialogTitle.setText(rankData.getRankTitle());//제목 값을 연결해준다
 //        Glide.with(context)
 //                .load(rankData.getThumbPath())
 //                .into(thumbPathImg);
-        Glide.with(RankDescriptionActivity).load(rankData.getThumbPath()).into(thumbPathImg);
 
+        //Glide를 사용해서  썸네일 url을 이미지로 뿌려준다
+        Glide.with(RankDescriptionActivity).load(rankData.getThumbPath()).into(thumbPathImg);//썸네일 url을 이미지로 값을 연결해준다
+
+        //play버튼을 클릭한경우
         playImgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //url주소를 가져온다
                 String url = rankData.getDetailLink();
+                //uri을 파싱한다
                 Uri uri = Uri.parse(url);
+                //uri로 이동시켜준다
                 Intent urlIntent = new Intent(Intent.ACTION_VIEW, uri);
 
+                //액티비티 실행
                 RankDescriptionActivity.startActivity(urlIntent);
 
-
 //                Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse( rankData.getDetailLink() ) );
 //                startActivity(browse);
             }
         });
 
-        urlBtn.setOnClickListener(new View.OnClickListener() {
+        //닫기 버튼 클릭한경우
+        closeDialogBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = rankData.getDetailLink();
-                Uri uri = Uri.parse(url);
-                Intent urlIntent = new Intent(Intent.ACTION_VIEW, uri);
-
-//                RankDescriptionActivity.startActivity(urlIntent);
+                //다이어로그 사라지게 한다
                 dismiss();
 
-
-//                Intent browse = new Intent( Intent.ACTION_VIEW , Uri.parse( rankData.getDetailLink() ) );
-//                startActivity(browse);
             }
         });
 
-        //        rankData = getIntent().getParcelableExtra("rankData");
-//        rankWriterName = getIntent().getExtras().get("작성자명").toString();
+     /*           rankData = getIntent().getParcelableExtra("rankData");
+        rankWriterName = getIntent().getExtras().get("작성자명").toString();
 
-//        Toast.makeText(this,"작성자면"+rankData.getRankWriter()+"댓글수"+rankData.getReplyCount()+"좋아요수"+rankData.getLikeCount()+"조회수"+rankData.getViewCount(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(RankDescriptionActivity,"작성자면"+rankData.getRankWriter(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,"작성자면"+rankData.getRankWriter()+"댓글수"+rankData.getReplyCount()+"좋아요수"+rankData.getLikeCount()+"조회수"+rankData.getViewCount(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(RankDescriptionActivity,"작성자면"+rankData.getRankWriter(), Toast.LENGTH_SHORT).show();*/
     }
 }

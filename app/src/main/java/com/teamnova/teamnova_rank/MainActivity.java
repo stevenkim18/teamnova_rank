@@ -701,7 +701,7 @@ public class MainActivity extends BaseActivity {
             return null;
         }
 
-        // AsyncTask 실행 후
+        // AsyncTask  실행 후
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);

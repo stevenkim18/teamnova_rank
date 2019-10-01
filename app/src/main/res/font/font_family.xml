@@ -7,14 +7,6 @@
         android:font="@font/title_font"
         android:fontStyle="normal"
         android:fontWeight="400" />
-    <font
-        android:font="@font/dialog_font"
-        android:fontStyle="normal"
-        android:fontWeight="400" />
-    <font
-        android:font="@font/game_font"
-        android:fontStyle="normal"
-        android:fontWeight="400" />
 
 
 </font-family>

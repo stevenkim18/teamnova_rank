@@ -175,7 +175,7 @@ public class MainActivity extends BaseActivity {
                 }
                 currentNum = 0;
 
-                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerview.scrollToPosition(0);
                 RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicJavaStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
@@ -245,7 +245,7 @@ public class MainActivity extends BaseActivity {
                     jsoupAsyncCrawler.execute(Constant.RANK_TYPE_BASIC_ANDROID);
                 }
 
-                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerview.scrollToPosition(0);
                 RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicAndroidStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicAndroidStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
@@ -316,7 +316,7 @@ public class MainActivity extends BaseActivity {
 //                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_BASIC_PHP);
                 }
 
-                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerview.scrollToPosition(0);
                 RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectBasicPhpStepList());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectBasicPhpStepList());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
@@ -386,7 +386,7 @@ public class MainActivity extends BaseActivity {
 //                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_1);
                 }
 
-                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerview.scrollToPosition(0);
                 RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep1List());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep1List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();
@@ -459,7 +459,7 @@ public class MainActivity extends BaseActivity {
 //                    jsoupAsyncCrawler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,Constant.RANK_TYPE_HARD_2);
                 }
 
-                RankRecyclerview.smoothScrollToPosition(0);
+                RankRecyclerview.scrollToPosition(0);
                 RankRecyclerviewAdapter.setFullListAdapter(databaseHelper.selectHardStep2List());
                 RankRecyclerviewAdapter.setRankDataList(databaseHelper.selectHardStep2List());
                 RankRecyclerviewAdapter.notifyDataSetChanged();

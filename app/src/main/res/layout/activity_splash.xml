@@ -7,6 +7,20 @@
     android:layout_height="match_parent"
     tools:context=".SplashActivity">
 
+    <TextView
+        android:text="Teamnova Ranking"
+        android:textSize="80sp"
+        android:textColor="@android:color/black"
+        android:gravity="center_horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fontFamily="@font/title_font"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/splash_lottie"
         android:layout_width="match_parent"
@@ -19,7 +33,5 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:lottie_loop="true" />
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

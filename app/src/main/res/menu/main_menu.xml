@@ -4,14 +4,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/main_search"
-        android:icon="@drawable/search_icon"
-        android:title="Item"
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_refresh_black_24dp"
+        android:title="새로고침"
         app:showAsAction="always"/>
+
     <item
-        android:id="@+id/main_list"
-        android:icon="@drawable/list_icon"
-        android:title="Item"
-        app:showAsAction="always"/>
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="검색"
+        app:showAsAction="always"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 
 </menu>

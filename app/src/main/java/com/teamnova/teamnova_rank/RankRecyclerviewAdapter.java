@@ -34,10 +34,6 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
 
     private Boolean isToolTipshowed;
 
-    public RankRecyclerviewAdapter(){
-        rankDataList = new ArrayList<>();
-    }
-
 
     public void setRankDataList(List<RankData> rankDataList) {
         this.rankDataList = rankDataList;
@@ -96,7 +92,7 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
 
             rankTitle = itemview.findViewById(R.id.title_textView);
             rankPoint = itemview.findViewById(R.id.ranking_point_textView);
-            rankImage = itemview.findViewById(R.id.thumb_path_img);
+            rankImage = itemview.findViewById(R.id.imageView);
             noramalRanking = itemview.findViewById(R.id.normal_ranking);
 
 
@@ -181,15 +177,18 @@ public class RankRecyclerviewAdapter extends RecyclerView.Adapter<RankRecyclervi
 
 
         //앞서 뷰홀더에 세팅해준 것을 각 위치에 맞는 것들로 보여주게 하기 위해서 세팅해준다.
-        holder.rankTitle.setText(data.getRankTitle()); //제목 보여주기
+        holder.rankTitle.setText(data.getRankWriter()); //제목 보여주기
         holder.rankPoint.setText(data.getRankingPoint()+"");//점수 보여주기
-        if(position == 0){
-            showTooltip(holder.rankPoint, isToolTipshowed);
-        }
 
 //        Glide.with(context)
 //                .load(data.getThumbPath())
 //                .into(holder.rankImage);
+
+        if(position == 0){
+            showTooltip(holder.rankPoint, isToolTipshowed);
+        }
+
+
 
 //        holder.rankImage.setImageURI(data.getThumbPath());
 

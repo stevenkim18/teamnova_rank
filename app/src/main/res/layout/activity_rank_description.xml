@@ -8,6 +8,23 @@
     android:background="@drawable/dialog_round_background"
     tools:context=".RankDescriptionActivity">
 
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:background="@color/teamnovaYellow"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/thumb_path_img"
+
+
+        />
+
+
     <ImageView
         android:id="@+id/thumb_path_img"
         android:layout_width="300dp"
@@ -15,7 +32,7 @@
         android:layout_gravity="center"
         android:scaleType="fitXY"
         android:src="@mipmap/ic_launcher"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_title"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         />

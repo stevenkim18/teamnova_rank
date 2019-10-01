@@ -68,6 +68,8 @@
                 android:layout_height="0dp"
                 android:text="제목"
                 android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:textSize="20sp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toRightOf="@id/imageView"
                 app:layout_constraintBottom_toBottomOf="parent"

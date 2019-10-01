@@ -18,19 +18,24 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+
+//RankDescriptionActivity = 다이얼로그
 public class RankDescriptionActivity extends Dialog {
-    private  TextView rankTitle,rankPoint,noramalRanking,rankView,rankName,rankLike,rankReply;
+    private  TextView rankView,rankName,rankLike,rankReply,dialogTitle;
     private ImageView thumbPathImg,playImgBtn;
-    private String rankWriterName;
     private RankData rankData;
     private Button urlBtn;
-    private Context context;
+
+
 
     public void setRankData(RankData rankData) {
         this.rankData = rankData;
     }
 
+    //RankDescriptionActivity 액티비티 생성
     private Activity RankDescriptionActivity;
+
+
     public RankDescriptionActivity(@NonNull Context context) {
         super(context);
         Activity RankDescriptionActivity = (context instanceof Activity) ? (Activity)context:null;
@@ -54,11 +59,14 @@ public class RankDescriptionActivity extends Dialog {
         thumbPathImg = findViewById(R.id.thumb_path_img);
         urlBtn = findViewById(R.id.btnDialog);
         playImgBtn = findViewById(R.id.play_img_btn);
+        dialogTitle = findViewById(R.id.dialog_title);
+
 
         rankLike.setText(rankData.getLikeCount()+" ");
         rankReply.setText(rankData.getReplyCount()+" ");
         rankView.setText(rankData.getViewCount()+" ");
         rankName.setText(rankData.getRankWriter());
+        dialogTitle.setText(rankData.getRankTitle());
 //        Glide.with(context)
 //                .load(rankData.getThumbPath())
 //                .into(thumbPathImg);

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/dialog_round_background"
-    tools:context=".MainActivity">
+    tools:context=".RankDescriptionActivity">
 
     <ImageView
         android:id="@+id/thumb_path_img"
@@ -20,10 +20,21 @@
         app:layout_constraintRight_toRightOf="parent"
         />
 
+    <ImageView
+        android:id="@+id/play_img_btn"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/play_icon"
+        app:layout_constraintTop_toTopOf="@+id/thumb_path_img"
+        app:layout_constraintLeft_toLeftOf="@+id/thumb_path_img"
+        app:layout_constraintRight_toRightOf="@+id/thumb_path_img"
+        app:layout_constraintBottom_toBottomOf="@+id/thumb_path_img"
+
+        />
+
 
     <ImageView
-
-        android:id="@+id/writer_imcon"
+        android:id="@+id/writer_icon"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@drawable/rank_writer_icon"
@@ -39,7 +50,7 @@
         android:layout_height="30dp"
         android:layout_marginTop="6dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
-        app:layout_constraintLeft_toRightOf="@+id/writer_imcon"
+        app:layout_constraintLeft_toRightOf="@+id/writer_icon"
         app:layout_constraintRight_toLeftOf="@+id/like_icon"
         android:gravity="center"
         android:textSize="10sp"
@@ -105,11 +116,11 @@
         android:layout_marginTop="6dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
         app:layout_constraintLeft_toRightOf="@+id/rank_reply"
-        app:layout_constraintRight_toLeftOf="@+id/rank_see"
+        app:layout_constraintRight_toLeftOf="@+id/rank_view"
         />
 
     <TextView
-        android:id="@+id/rank_see"
+        android:id="@+id/rank_view"
         android:layout_width="30dp"
         android:layout_height="30dp"
         app:layout_constraintTop_toBottomOf="@+id/thumb_path_img"
@@ -117,7 +128,7 @@
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginTop="6dp"
         android:gravity="center"
-        android:textSize="20sp"
+        android:textSize="11sp"
         android:textStyle="bold"
         android:text="1"
         />
@@ -126,19 +137,14 @@
         android:id="@+id/btnDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="확인"
+        android:layout_margin="10dp"
+        android:text="닫기"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18sp"
         app:backgroundTint="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rank_see"/>
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rank_view"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,11 +7,11 @@
         android:id="@+id/main_search"
         android:icon="@drawable/search_icon"
         android:title="Item"
-        app:showAsAction="always" />
+        app:showAsAction="always"/>
     <item
         android:id="@+id/main_list"
         android:icon="@drawable/list_icon"
         android:title="Item"
-        app:showAsAction="always" />
+        app:showAsAction="always"/>
 
 </menu>

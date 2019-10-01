@@ -194,6 +194,15 @@ public class AdmobActivity extends AppCompatActivity {
                 }
             }
         });
+
+        noUpdateTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AdmobActivity.this,MainActivity.class);
+                startActivity(intent);
+
+            }
+        });
     }
 
     public void startCrawling(){

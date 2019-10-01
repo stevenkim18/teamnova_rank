@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -74,10 +75,10 @@ public class MainActivity extends AppCompatActivity {
         mainHard1StepBtn = findViewById(R.id.main_hard1_step_btn);
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
-        rankName = findViewById(R.id.rank_name);
+/*        rankName = findViewById(R.id.rank_name);
         rankLike = findViewById(R.id.rank_like);
         rankReply = findViewById(R.id.rank_reply);
-        rankView = findViewById(R.id.rank_view);
+        rankView = findViewById(R.id.rank_view);*/
 
         mainToolbar = findViewById(R.id.main_toolbar);
         mainToolbar.setTitle(""); //메인 툴바에 나오는 앱 제목을 지우기 위해 공백으로 표현
@@ -263,7 +264,10 @@ public class MainActivity extends AppCompatActivity {
 //            Intent intent = new Intent(MainActivity.this,RankDescriptionActivity.class);
 //            intent.putExtra("rankData",rankData);
 //            startActivity(intent);
+            Log.v("메인액티비티", "ID = " + rankData.getRankID());
+
             showAlertDialog(rankData);
+
         }
     };
 
@@ -279,6 +283,8 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.setRankData(rankData);
         alertDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //다이어로그 애니메이션방식
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+//        rankLike.setText(rankData.getLikeCount()+" ");
 
         alertDialog.show();
         //확인 버튼 클릭시 다이어로그 사라짐

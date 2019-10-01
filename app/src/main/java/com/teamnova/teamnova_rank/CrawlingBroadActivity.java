@@ -2,6 +2,7 @@ package com.teamnova.teamnova_rank;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,8 +43,11 @@ public class CrawlingBroadActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                jsoupAsyncTask.execute();
+                Intent intent = new Intent(CrawlingBroadActivity.this,MainActivity.class);
+                startActivity(intent);
+
+               /* JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
+                jsoupAsyncTask.execute();*/
 
             }
         });

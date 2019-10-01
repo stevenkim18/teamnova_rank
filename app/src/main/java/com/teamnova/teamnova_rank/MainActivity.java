@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity {
     private Button mainJavaStepBtn, mainAndroidStepBtn, mainPhpStepBtn, mainHard1StepBtn,
             mainHard2StepBtn;
 
-    private TextView rankView,rankName,rankLike,rankReply;
+    private TextView toolbar_title;
     //RankRecyclerview:선택한 작품들을 보여주는 리사이클러뷰
     private RecyclerView RankRecyclerview;
 
@@ -102,6 +102,7 @@ public class MainActivity extends BaseActivity {
         mainHard2StepBtn = findViewById(R.id.main_hard2_step_btn);
 
         mainToolbar = findViewById(R.id.main_toolbar);
+        toolbar_title = findViewById(R.id.toolbar_title);
 
         mainJavaStepBtn.setSelected(true);
         RankRecyclerview = findViewById(R.id.rank_recyclerview);
@@ -539,6 +540,21 @@ public class MainActivity extends BaseActivity {
 
         // searchView 힌트
         searchView.setQueryHint("이름 검색");
+
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toolbar_title.setVisibility(View.GONE);
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                toolbar_title.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

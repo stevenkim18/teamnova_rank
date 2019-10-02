@@ -20,8 +20,9 @@ TEAM NOVA RANKING은 팀노바 오픈 카페에 올라온 작품들을 크롤링
 * 응용2단계
  
 랭킹 선정 기준은 댓글 수 + 조회 수 + (5 * 좋아요 수)입니다.
-![Screenshot_20191002103952](https://user-images.githubusercontent.com/26181611/66014527-3bf73080-e50a-11e9-83cd-38e77573d935.jpg){: width="100" height="100"}
- 
+
+<img src="https://user-images.githubusercontent.com/26181611/66014527-3bf73080-e50a-11e9-83cd-38e77573d935.jpg" width="300" height="300">
+
 앱을 처음 설치하고, 크롤링한 데이터가 DB에 없을 경우 단계별로 크롤링이 진행되고 그 시간 동안 광고 시청을 할 수 있습니다.
 ![Screenshot_20191002104012](https://user-images.githubusercontent.com/26181611/66014542-444f6b80-e50a-11e9-994b-e9c98f4189b7.jpg){: width="100" height="100"}
 ![Screenshot_20191002104017](https://user-images.githubusercontent.com/26181611/66014536-41547b00-e50a-11e9-8f67-82d5b072197c.jpg){: width="100" height="100"}

@@ -1,6 +1,9 @@
 # TEAM NOVA RANKING
 
 TEAM NOVA RANKING은 팀노바 오픈 카페(<https://cafe.naver.com/teamnovaopen>)에 올라온 작품들을 가져오고<br> 각 단계별 순위를 보여줍니다.<br><br>
+작품 설명 링크 : https://cafe.naver.com/teamnovaopen?iframe_url=/ArticleRead.nhn%3Fclubid=29412673%26page=2%26menuid=26%26boardtype=L%26articleid=1153%26referrerAllArticles=false<br>
+인터뷰 영상 : https://www.youtube.com/watch?v=CimYezMe7F8 <br>
+             https://www.youtube.com/watch?v=R5fC00rqUBg <br>
 
 * 기초 JAVA
 * 기초 Android

@@ -5,7 +5,7 @@ TEAM NOVA RANKING은 팀노바 오픈 카페(<https://cafe.naver.com/teamnovaope
 인터뷰 영상 : https://www.youtube.com/watch?v=CimYezMe7F8 <br>
              https://www.youtube.com/watch?v=R5fC00rqUBg <br>
              
-개발 기간 : 1
+개발 기간 : 1주
 
 * 기초 JAVA
 * 기초 Android

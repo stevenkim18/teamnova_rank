@@ -4,6 +4,8 @@ TEAM NOVA RANKING은 팀노바 오픈 카페(<https://cafe.naver.com/teamnovaope
 작품 설명 링크 : https://cafe.naver.com/teamnovaopen?iframe_url=/ArticleRead.nhn%3Fclubid=29412673%26page=2%26menuid=26%26boardtype=L%26articleid=1153%26referrerAllArticles=false<br>
 인터뷰 영상 : https://www.youtube.com/watch?v=CimYezMe7F8 <br>
              https://www.youtube.com/watch?v=R5fC00rqUBg <br>
+             
+개발 기간 : 1
 
 * 기초 JAVA
 * 기초 Android
